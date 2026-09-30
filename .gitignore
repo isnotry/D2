@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+._*
+
+# 私人笔记库：含游戏截图等受版权保护的素材，不进仓库
+diablo2.logseq/
+
+# 临时/本地脚本
+temp/
+*.log
+
+# 本地工作痕迹（agent 记忆、发布元数据）
+.workbuddy/
+__pycache__/

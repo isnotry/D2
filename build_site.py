@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Generate a static, content-rich Diablo II: Resurrected guide site (v2, concatenation-based)."""
 import os
+import datetime
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 os.makedirs(os.path.join(OUT, "css"), exist_ok=True)
@@ -189,7 +190,7 @@ def zh(text):
     def _repl(m):
         for _n, (_z, _e) in _ZH_MAP.items():
             if m.group(_n) is not None:
-                return '<span class="zt"><span class="zc">%s </span><span class="ec">%s</span></span>' % (_z, _e)
+                return '<span class="zt"><span class="zc">%s </span><span class="ec" lang="en">%s</span></span>' % (_z, _e)
         return m.group(0)
     return _ZH_RE.sub(_repl, text)
 
@@ -198,7 +199,7 @@ def bi(zh_text, en_text):
     用于正文、标题、说明等无法被 zh() 术语表覆盖的纯中文内容。"""
     if not zh_text:
         return en_text or ""
-    return '<span class="zt"><span class="zc">%s </span><span class="ec">%s</span></span>' % (zh_text, en_text)
+    return '<span class="zt"><span class="zc">%s </span><span class="ec" lang="en">%s</span></span>' % (zh_text, en_text)
 
 def en_title(t):
     """从「中文 English」标题里取最长的纯英文词，用于 EN 模式的浏览器标签。"""
@@ -425,12 +426,12 @@ def nav_html(depth, active):
     parts = ['<a href="' + p + 'index.html"' + (' class="active"' if active == "home" else "") + '>' + bi("首页", "Home") + '</a>']
     parts.append('<a href="' + p + 'classes/amazon.html"' + (' class="active"' if active.startswith("c:") else "") + '>' + bi("职业", "Classes") + '</a>')
     parts.append('<a href="' + p + 'guides/runewords.html"' + (' class="active"' if active.startswith("g:") else "") + '>' + bi("攻略", "Guides") + '</a>')
-    return '<nav class="topbar"><div class="wrap"><div class="brand"><span class="dot"></span> ' + bi("暗黑 II 攻略站", "Diablo II Guide") + '</div>' \
+    return '<nav class="topbar" aria-label="主导航"><div class="wrap"><div class="brand"><span class="dot"></span> ' + bi("暗黑 II 攻略站", "Diablo II Guide") + '</div>' \
            '<button class="menu-toggle" aria-label="菜单">☰</button><div class="navlinks">' + "".join(parts) + '</div></div></nav>'
 
 def sidebar_html(depth, active):
     p = "../" if depth else ""
-    out = ['<aside class="sidebar"><div class="grp"><h4>' + bi("职业 Classes", "Classes") + '</h4>']
+    out = ['<aside class="sidebar" aria-label="站点导航"><div class="grp"><h4>' + bi("职业 Classes", "Classes") + '</h4>']
     for cid, cn, en in CLASS_LIST:
         cls = ' class="active"' if active == "c:" + cid else ""
         out.append('<a href="' + p + 'classes/' + cid + '.html"' + cls + '>' + bi(cn, en) + '</a>')
@@ -441,7 +442,127 @@ def sidebar_html(depth, active):
     out.append('</div></aside>')
     return "".join(out)
 
-def page(title, depth, body, active, sub_layout=False):
+SITE_URL = "https://kingsir.work/D2/"
+SITE_NAME = "暗黑破坏神 II：复活攻略站"
+SITE_NAME_EN = "Diablo II: Resurrected Guide"
+SITE_DESC = "Diablo II: Resurrected 全职业加点与流派攻略的中英双语静态站，零依赖零构建，打开即用。"
+OG_IMAGE = SITE_URL + "docs/og-image.png"
+OG_IMAGE_ALT = "暗黑破坏神 II：复活攻略站 · 职业总览与攻略入口"
+
+HOME_DESC = "暗黑破坏神 II：复活（D2R）全职业攻略站：八大职业技能树加点、主流流派 Build、装备思路与开荒/终局技巧，附符文之语图鉴、恐怖地带、Uber 终局与速刷 MF 指南。已同步 Patch 3.3 / 天梯第 15 赛季，中英双语、纯静态零依赖。"
+HOME_KW = "暗黑破坏神2,暗黑2重制版,Diablo II Resurrected,D2R,职业加点,流派Build,符文之语,恐怖地带"
+
+CLASS_DESC = {
+    "amazon": "亚马逊（Amazon）暗黑2重制版攻略：标枪亚马逊 Javazon 与弓亚马逊 Bowazon 的技能加点、属性点分配、核心装备搭配与电免处理要点，含 Lightning Fury 流派的加点思路，适配 Patch 3.3。",
+    "sorceress": "法师（Sorceress）暗黑2重制版攻略：暴风雪/冰封球纯冰法、闪电新星法与火冰双修的技能加点、FCR 档位、MF 配装与瞬移手感优化，开荒最速职业，适配 Patch 3.3。",
+    "necromancer": "亡灵法师（Necromancer）暗黑2重制版攻略：召唤流、毒亡灵法师与骨系的技能加点、尸体爆炸清场、破免与 MF 配置，单人通关最省心职业，适配 Patch 3.3。",
+    "paladin": "圣骑士（Paladin）暗黑2重制版攻略：祝福之锤 Hammerdin、热诚 Zealot 与天堂之拳/盾击的技能加点、FCR 与抗性档位、廉价开荒配装，新手首选职业，适配 Patch 3.3。",
+    "barbarian": "野蛮人（Barbarian）暗黑2重制版攻略：旋风 Whirlwind、狂乱 Frenzy、寻物 Pitzerker 与战吼 Singing 的技能加点、武器选择、AR 与 MF 平衡思路，适配 Patch 3.3。",
+    "druid": "德鲁伊（Druid）暗黑2重制版攻略：风德、火德与狼人狂怒变身的技能加点、破免前的ç ´免思路、武器攻速档位与佣兵搭配，适配 Patch 3.3。",
+    "warlock": "术士（Warlock）暗黑2重制版攻略：2026 资料片第八职业 Chaos / Eldritch / Demon 三系技能树、Sigil: Death 主推流派、束缚恶魔辅助定位与 Patch 3.3 修正说明。",
+    "assassin": "刺客（Assassin）暗黑2重制版攻略：陷阱 Trapsin、马赛克 Mosaic 武学与飞刀的技能加点、IAS 档位、无限 Anya 项链等核心装备与破免配法，适配 Patch 3.3。",
+}
+CLASS_KW = {
+    "amazon": "亚马逊,Amazon,Javazon,标枪亚马逊,加点,流派",
+    "sorceress": "法师,Sorceress,暴风雪,冰封球,法师加点,MF",
+    "necromancer": "亡灵法师,Necromancer,召唤流,骨系,尸体爆炸,加点",
+    "paladin": "圣骑士,Paladin,祝福之锤,Hammerdin,新手职业,加点",
+    "barbarian": "野蛮人,Barbarian,旋风,Whirlwind,寻物,战吼,加点",
+    "druid": "德鲁伊,Druid,风德,狼人变化,加点",
+    "warlock": "术士,Warlock,Sigil Death,新职业,2026资料片,加点",
+    "assassin": "刺客,Assassin,陷阱,Mosaic,马赛克,武学,加点",
+}
+
+GUIDE_DESC = {
+    "runewords": "符文之语图鉴：常用符文之语配方、符文序号、底材与孔数需求、适用职业与定位速查，含天梯专属轮换到非天梯的说明，一张表格看全部。",
+    "leveling": "练级与开荒指南：1-85 级路线规划、效率练级点、Patch 3.3 加强后的练级暗金推荐与开荒职业起步流程。",
+    "terror-zones": "恐怖地带与破免护符攻略：恐怖地带解锁与轮换规则、等级随动机制、Herald of Terror 掉落优先级，以及六系破免护符的获取条件与 Patch 3.3 改动。",
+    "uber": "Uber 终局攻略：钥匙与传送门获取、三大 Uber boss 打法、盾击 Smiter 配装与抗性堆叠要求、掉落的暗金与地狱火炬属性。",
+    "tips": "综合技巧汇总：技能与属性点重置（赦罪令牌 / 赫拉迪克方块）、方块合成配方、掉落与 MF 常识、常用交易术语与暗语速查。",
+    "farming": "速刷与 MF 指南：85 场景推荐表、纯冰法高 MF 配装模板、佣兵 Infinity 破冰免、劳模/安姐/暗黑速刷循环与卓古拉之握掉落路线。",
+}
+GUIDE_KW = {
+    "runewords": "符文之语,Runewords,配方,Ist,Ber,Mosaic,底材",
+    "leveling": "练级,开荒,1-85级,练级路线,练级暗金",
+    "terror-zones": "恐怖地带,Terror Zones,破免护符,Sunder Charms,Herald of Terror",
+    "uber": "Uber,Uber终局,地狱火炬,Smiter,盾击,超级boss",
+    "tips": "综合技巧,赫拉迪克方块,重置属性,赦罪令牌,交易术语,MF常识",
+    "farming": "速刷,MF,Magic Find,85场景,劳模,安姐,卓古拉之握",
+}
+
+def _esc_attr(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+def _page_rel(active):
+    if active.startswith("c:"):
+        return "classes/" + active[2:] + ".html"
+    if active.startswith("g:"):
+        return "guides/" + active[2:] + ".html"
+    return ""
+
+def seo_meta(depth, active, title, en_t, desc, keywords):
+    """每页唯一的 description / canonical / Open Graph / Twitter Card / JSON-LD。"""
+    p = "../" if depth else ""
+    rel = _page_rel(active)
+    url = SITE_URL + rel
+    pg_name = _esc_attr(title)
+    pg_desc = _esc_attr(desc)
+    crumbs = [("首页", SITE_URL)]
+    if rel:
+        if rel.startswith("classes/"):
+            cid = rel[len("classes/"):-5]
+            nm = next((n for c, n, e in CLASS_LIST if c == cid), "职业")
+            crumbs.append(("职业", ""))
+        else:
+            gid = rel[len("guides/"):-5]
+            nm = next((n for g, n, e in GUIDE_LIST if g == gid), "攻略")
+            crumbs.append(("攻略", ""))
+        label = _esc_attr(nm)
+        crumbs.append((label, ""))
+    items = []
+    for i, (nm, href) in enumerate(crumbs, 1):
+        it = '{"@type":"ListItem","position":%d,"name":"%s"' % (i, _esc_attr(nm))
+        if href:
+            it += ',"item":"%s"' % href
+        items.append(it + "}")
+    graph = [
+        '{"@type":"WebSite","@id":"%s#website","url":"%s","name":"%s","description":"%s","inLanguage":["zh-CN","en-US"],"publisher":{"@id":"%s#organization"}}' % (
+            SITE_URL, SITE_URL, _esc_attr(SITE_NAME), _esc_attr(SITE_DESC), SITE_URL),
+        '{"@type":"Organization","@id":"%s#organization","name":"%s","url":"%s"}' % (
+            SITE_URL, _esc_attr(SITE_NAME), SITE_URL),
+        '{"@type":"WebPage","@id":"%s","url":"%s","name":"%s","description":"%s","isPartOf":{"@id":"%s#website"},"inLanguage":["zh-CN","en-US"],"breadcrumb":{"@id":"%s#breadcrumb"}}' % (
+            url, url, pg_name, pg_desc, SITE_URL, url),
+        '{"@type":"BreadcrumbList","@id":"%s#breadcrumb","itemListElement":[%s]}' % (url, ",".join(items)),
+    ]
+    ld = '<script type="application/ld+json">{"@context":"https://schema.org","@graph":[' + ",".join(graph) + "]}</script>"
+    og_type = "website" if not rel else "article"
+    return (''  # canonical
+            '<link rel="canonical" href="' + url + '">\n'
+            '<meta name="description" content="' + pg_desc + '">\n'
+            '<meta name="keywords" content="' + _esc_attr(keywords) + '">\n'
+            '<meta name="robots" content="index,follow,max-image-preview:large">\n'
+            '<meta name="theme-color" content="#0c0a09">\n'
+            '<link rel="icon" href="' + p + 'favicon.svg" type="image/svg+xml">\n'
+            '<link rel="apple-touch-icon" href="' + p + 'docs/apple-touch-icon.png">\n'
+            # Open Graph
+            '<meta property="og:type" content="' + og_type + '">\n'
+            '<meta property="og:site_name" content="' + _esc_attr(SITE_NAME) + '">\n'
+            '<meta property="og:locale" content="zh_CN">\n'
+            '<meta property="og:locale:alternate" content="en_US">\n'
+            '<meta property="og:url" content="' + url + '">\n'
+            '<meta property="og:title" content="' + pg_name + '">\n'
+            '<meta property="og:description" content="' + pg_desc + '">\n'
+            '<meta property="og:image" content="' + OG_IMAGE + '">\n'
+            '<meta property="og:image:alt" content="' + _esc_attr(OG_IMAGE_ALT) + '">\n'
+            # Twitter / X
+            '<meta name="twitter:card" content="summary_large_image">\n'
+            '<meta name="twitter:title" content="' + pg_name + '">\n'
+            '<meta name="twitter:description" content="' + pg_desc + '">\n'
+            '<meta name="twitter:image" content="' + OG_IMAGE + '">\n'
+            '<meta name="twitter:image:alt" content="' + _esc_attr(OG_IMAGE_ALT) + '">\n'
+            + ld + '\n')
+
+def page(title, depth, body, active, sub_layout=False, desc="", en_t=None, keywords=""):
     p = "../" if depth else ""
     nav = nav_html(depth, active)
     side = sidebar_html(depth, active) if sub_layout else ""
@@ -449,21 +570,22 @@ def page(title, depth, body, active, sub_layout=False):
         main_open = '<div class="layout">' + side + '<main class="content">'
         main_close = '</main></div>'
     else:
-        main_open = '<div class="wrap" style="padding:30px 18px 60px">'
-        main_close = '</div>'
+        main_open = '<main class="home"><div class="wrap" style="padding:30px 18px 60px">'
+        main_close = '</div></main>'
     foot = '<footer><div class="wrap"><span>' + bi("暗黑破坏神 II：复活 · 静态攻略站", "Diablo II: Resurrected · Static Guide") + '</span>' \
            '<span>' + bi("基于 D2R 最新 meta（Sunder Charms / Terror Zones / Mosaic 等）整理", "Built around the latest D2R meta (Sunder Charms / Terror Zones / Mosaic Runewords, Ladder seasons).") + '</span></div>' \
            '<div class="wrap disc"><span>' + bi("非官方粉丝站 · 与暴雪娱乐无关。Diablo / Diablo II: Resurrected 为 Blizzard Entertainment, Inc. 的商标，本站仅作指示性引用。", "Unofficial fan site, not affiliated with Blizzard Entertainment. Diablo / Diablo II: Resurrected are trademarks of Blizzard Entertainment, Inc.; used here for identification only.") + '</span><br />' \
            + '<span class="zt"><a class="zc repo" href="https://github.com/isnotry/D2" target="_blank" rel="noopener noreferrer">GitHub 开源仓库</a><a class="ec repo" href="https://github.com/isnotry/D2" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></span></div></footer>'
     raw_title = title
-    title = zh(title)
     body = zh(body)
     body = rune_no(body)
-    et = en_title(raw_title)
-    return "<!DOCTYPE html>\n<html lang=\"zh-CN\" data-en-title=\"" + et + "\">\n<head>\n<meta charset=\"utf-8\">\n" \
-           "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>" + title + "</title>\n" \
-           "<meta name=\"description\" content=\"暗黑破坏神2：复活(Diablo II Resurrected) 职业加点、流派与游戏技巧静态攻略站\">\n" \
+    et = en_t or en_title(raw_title)
+    seo = seo_meta(depth, active, raw_title, et, desc or SITE_DESC, keywords or HOME_KW)
+    return "<!DOCTYPE html>\n<html lang=\"zh-CN\" data-en-title=\"" + _esc_attr(et) + "\">\n<head>\n<meta charset=\"utf-8\">\n" \
+           "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>" + raw_title + "</title>\n" \
+           + seo + \
            "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n" \
+           "<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n" \
            "<link href=\"https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap\" rel=\"stylesheet\">\n" \
            "<link rel=\"stylesheet\" href=\"" + p + "css/style.css\">\n</head>\n<body>\n" + nav + "\n" \
            + main_open + "\n" + body + "\n" + main_close + "\n" + foot + "\n" \
@@ -510,7 +632,7 @@ def home():
         "assassin": bi("陷阱/武学", "Traps/Martial Arts"),
     }
     for cid, cn, en in CLASS_LIST:
-        cls_cards.append('<a class="cls-card" href="classes/' + cid + '.html"><div class="em">' + emojis[cid] + '</div><h3><span class="zt"><span class="zc">' + cn + ' </span><span class="ec">' + en + '</span></span></h3><p><span class="role">' + roles[cid] + '</span></p></a>')
+        cls_cards.append('<a class="cls-card" href="classes/' + cid + '.html"><div class="em">' + emojis[cid] + '</div><h3><span class="zt"><span class="zc">' + cn + ' </span><span class="ec" lang="en">' + en + '</span></span></h3><p><span class="role">' + roles[cid] + '</span></p></a>')
     feat = [
         ("☀️ " + bi("破免护符", "Sunder Charms"), "",
          bi("六系破免大型护符（火/冰/电/毒/物理/魔法），打破怪物免疫，让更多流派能 farm 全图。<b>3.3 补丁起</b>获取门槛提高：潜伏破免最低掉落等级 69→75，靠 Magic Find 刷取掉率下调且<b>仅限地狱难度</b>。",
@@ -569,7 +691,8 @@ def home():
             + bi("内容基于 D2R <b>Patch 3.3 / 天梯第 15 赛季</b>（2026-08-21 开启）的 meta 整理：破免获取被推回地狱难度、Herald 掉落上位、练级暗金集体加强、上一批天梯符文之语转入非天梯、术士经历一轮修正。偏向 PvM 单人/组队开荒与终局 farm。技能与属性点现在均可重置（赦罪令牌 / 工坊），大胆尝试不同流派即可。",
                  "Everything here is built around the <b>Patch 3.3 / Ladder Season 15</b> meta (opened 21 Aug 2026): Sunder access pushed back into Hell, Heralds promoted as the farming target, leveling uniques buffed across the board, last season's ladder runewords moved to non-ladder, and the Warlock going through a round of corrections. The focus is PvM — solo/party progression and endgame farming. Skills and stats can be respecced freely (Token of Absolution / Horadric Cube), so feel free to experiment with builds.") \
             + '\n  </div>\n</div>\n'
-    return page("暗黑破坏神 II：复活 · 攻略站", 0, body, "home")
+    return page("暗黑破坏神 II：复活攻略站 · 全职业加点与流派 Build", 0, body, "home",
+                desc=HOME_DESC, en_t="Diablo II: Resurrected Guide — Builds, Skills & Tips", keywords=HOME_KW)
 
 # ===========================================================================
 # CLASS PAGES
@@ -587,23 +710,25 @@ def _class_page(title, active, intro, trees, builds, tips_html, prev_href, prev_
         if _c == _cid:
             _cn, _en = _n, _e
             break
-    _crumb = '<span class="zt"><span class="zc">%s </span><span class="ec">%s</span></span>' % (_cn, _en)
+    _crumb = '<span class="zt"><span class="zc">%s </span><span class="ec" lang="en">%s</span></span>' % (_cn, _en)
     body = '<div class="breadcrumb"><a href="../index.html">' + bi("首页", "Home") + '</a> / ' + _crumb + '</div>\n' \
            + intro + '\n<h2 class="section-id" id="trees">' + bi("技能树", "Skill Trees") + '</h2>\n' + trees + '\n' \
            + '<h2 class="section-id" id="builds">' + bi("主流流派", "Meta Builds") + '</h2>\n' + builds + '\n' \
            + '<h2 class="section-id" id="tips">' + bi("开荒与通用技巧", "Progression & General Tips") + '</h2>\n' + tips_html + '\n' + pager
-    return page(title + " · 暗黑 II 攻略", 1, body, active, True)
+    return page(_cn + "（" + _en + "）加点与流派 Build · 暗黑破坏神 II 攻略站", 1, body, active, True,
+                desc=CLASS_DESC.get(_cid, SITE_DESC), en_t=_en + " Builds & Skill Guide | Diablo II: Resurrected",
+                keywords=CLASS_KW.get(_cid, HOME_KW))
 
 
 def _wrap_name(name):
     """把「中文 English」分页名包成可切换 span（无空格则原样返回）。"""
     if " " in name:
         cn, en = name.split(" ", 1)
-        return '<span class="zt"><span class="zc">%s </span><span class="ec">%s</span></span>' % (cn, en)
+        return '<span class="zt"><span class="zc">%s </span><span class="ec" lang="en">%s</span></span>' % (cn, en)
     return name
 
 def amazon():
-    intro = '<h1><span class="zt"><span class="zc">亚马逊 </span><span class="ec">Amazon</span></span></h1>\n' \
+    intro = '<h1><span class="zt"><span class="zc">亚马逊 </span><span class="ec" lang="en">Amazon</span></span></h1>\n' \
             '<p>' + bi("亚马逊是远程输出的多面手，三大系分别对应 <b>标枪/长矛</b>、<b>弓/十字弓</b> 与 <b>被动闪避</b>。她拥有游戏里最强的范围电系输出（Lightning Fury），同时被动系提供极高生存，是最适合开荒与终局 farm 的职业之一。",
                        "The Amazon is the all-round ranged damage dealer. Her three trees cover <b>Javelin/Spear</b>, <b>Bow/Crossbow</b> and <b>passive evasion</b>. She has the best AoE lightning damage in the game (Lightning Fury) while her passives give huge survivability, making her one of the best classes for both progression and endgame farming.") + '</p>\n' \
             '<div class="callout tip"><b>' + bi("定位：", "Role:") + '</b>' \
@@ -700,7 +825,7 @@ def amazon():
     return _class_page("亚马逊 Amazon", "c:amazon", intro, trees, builds, tips, "../index.html", bi("返回首页", "Back to Home"), "sorceress.html", "法师 Sorceress")
 
 def sorceress():
-    intro = '<h1><span class="zt"><span class="zc">法师 </span><span class="ec">Sorceress</span></span></h1>\n' \
+    intro = '<h1><span class="zt"><span class="zc">法师 </span><span class="ec" lang="en">Sorceress</span></span></h1>\n' \
             '<p>' + bi("法师是法系的标杆，唯一拥有 <b>Teleport</b> 的职业，刷图效率与机动性无人能及。三系（冰/电/火）各有强力 build，是开荒、MF 与 boss rush 的核心。她也是新手最推荐的起手职业之一。",
                        "The Sorceress is the benchmark caster and the only class with <b>Teleport</b>, giving her unmatched farming speed and mobility. All three trees (Cold/Lightning/Fire) have strong builds, making her the go-to for progression, MF and boss rushes — and one of the best starter classes for new players.") + '</p>\n' \
             '<div class="callout tip"><b>' + bi("定位：", "Role:") + '</b>' \
@@ -820,7 +945,7 @@ def sorceress():
     return _class_page("法师 Sorceress", "c:sorceress", intro, trees, builds, tips, "amazon.html", "亚马逊 Amazon", "necromancer.html", "亡灵法师 Necromancer")
 
 def necromancer():
-    intro = '<h1><span class="zt"><span class="zc">亡灵法师 </span><span class="ec">Necromancer</span></span></h1>\n' \
+    intro = '<h1><span class="zt"><span class="zc">亡灵法师 </span><span class="ec" lang="en">Necromancer</span></span></h1>\n' \
             '<p>' + bi("亡灵法师是「让别人干活」的大师：召唤亡灵大军、施放毒与骨系法术、并用诅咒削弱敌人。召唤流是新手最友好的开荒流派（安全、省力），毒系与骨系则在终局拥有不俗输出。",
                        "The Necromancer is the master of letting others do the work: raise an undead army, sling poison and bone spells, and cripple enemies with curses. Summoner is the most beginner-friendly progression build (safe and low effort), while Poison and Bone deliver solid endgame damage.") + '</p>\n' \
             '<div class="callout tip"><b>' + bi("定位：", "Role:") + '</b>' \
@@ -935,7 +1060,7 @@ def necromancer():
     return _class_page("亡灵法师 Necromancer", "c:necromancer", intro, trees, builds, tips, "sorceress.html", "法师 Sorceress", "paladin.html", "圣骑士 Paladin")
 
 def paladin():
-    intro = '<h1><span class="zt"><span class="zc">圣骑士 </span><span class="ec">Paladin</span></span></h1>\n' \
+    intro = '<h1><span class="zt"><span class="zc">圣骑士 </span><span class="ec" lang="en">Paladin</span></span></h1>\n' \
             '<p>' + bi("圣骑士是「光环 + 祝福之锤」的代名词，也是开荒与终局最稳的近战/法系混合职业。祝福之锤圣骑士几乎能单人打通全剧并高效 farm，是新手与老玩家共同的首选。",
                        "The Paladin is synonymous with auras and Blessed Hammer, and he is the most reliable melee/caster hybrid for both progression and endgame. A Hammerdin can solo the entire game and farm efficiently, which is why veterans and beginners alike pick him first.") + '</p>\n' \
             '<div class="callout tip"><b>' + bi("定位：", "Role:") + '</b>' \
@@ -1055,7 +1180,7 @@ def paladin():
     return _class_page("圣骑士 Paladin", "c:paladin", intro, trees, builds, tips, "necromancer.html", "亡灵法师 Necromancer", "barbarian.html", "野蛮人 Barbarian")
 
 def barbarian():
-    intro = '<h1><span class="zt"><span class="zc">野蛮人 </span><span class="ec">Barbarian</span></span></h1>\n' \
+    intro = '<h1><span class="zt"><span class="zc">野蛮人 </span><span class="ec" lang="en">Barbarian</span></span></h1>\n' \
             '<p>' + bi("野蛮人是近战与「战吼」大师，拥有全游戏最强的光环类增益（Battle Orders 提升生命/法力上限）与独特的 Find Item（寻物）双倍掉落机制。虽然开荒偏慢，但终局 Whirlwind 与 Pitzerker 都是顶级 farm 流派。",
                        "The Barbarian is the master of melee and warcries. He brings the strongest party buff in the game (Battle Orders raises max life and mana) and the unique Find Item mechanic that rolls loot a second time. Leveling is slow, but at endgame both Whirlwind and the Pitzerker are top-tier farming builds.") + '</p>\n' \
             '<div class="callout warn"><b>' + bi("定位：", "Role:") + '</b>' \
@@ -1177,7 +1302,7 @@ def barbarian():
     return _class_page("野蛮人 Barbarian", "c:barbarian", intro, trees, builds, tips, "paladin.html", "圣骑士 Paladin", "druid.html", "德鲁伊 Druid")
 
 def druid():
-    intro = '<h1><span class="zt"><span class="zc">德鲁伊 </span><span class="ec">Druid</span></span></h1>\n' \
+    intro = '<h1><span class="zt"><span class="zc">德鲁伊 </span><span class="ec" lang="en">Druid</span></span></h1>\n' \
             '<p>' + bi("德鲁伊是元素与变身的双修者：风德（Tornado + Hurricane）远程范围控场，火德（Fissure/Volcano/Armageddon）暴力 AoE，狼人/熊人则化身近战猛兽。Mosaic 与 Flickering Flame 等新符文之语也让他如虎添翼。",
                        "The Druid mixes elemental magic with shapeshifting: the Wind Druid (Tornado + Hurricane) controls the field from range, the Fire Druid (Fissure/Volcano/Armageddon) unleashes brutal AoE, and Werewolf/Werebear forms turn him into a melee beast. New runewords like Mosaic and Flickering Flame have pushed him even further.") + '</p>\n' \
             '<div class="callout tip"><b>' + bi("定位：", "Role:") + '</b>' \
@@ -1298,7 +1423,7 @@ def druid():
     return _class_page("德鲁伊 Druid", "c:druid", intro, trees, builds, tips, "barbarian.html", "野蛮人 Barbarian", "warlock.html", "术士 Warlock")
 
 def warlock():
-    intro = '<h1><span class="zt"><span class="zc">术士 </span><span class="ec">Warlock</span></span></h1>\n' \
+    intro = '<h1><span class="zt"><span class="zc">术士 </span><span class="ec" lang="en">Warlock</span></span></h1>\n' \
             '<p>' + bi("术士是《暗黑破坏神 II：复活》「术士君临（Reign of the Warlock）」资料片在 2026 年新增的第八个职业，也是原版发售 25 年来首次加入的新职业。他是一位钻研禁忌恶魔之术的黑暗学者，通过束缚、奴役甚至吞噬恶魔来获取力量。三大技能树分别为 <b>Chaos（混沌）</b>、<b>Eldritch（邪术）</b> 与 <b>Demon（恶魔）</b>。",
                        "The Warlock is the eighth class, added to Diablo II: Resurrected by the 2026 <i>Reign of the Warlock</i> expansion — the first new class in the 25 years since the original release. He is a dark scholar of forbidden demonic arts who gains power by binding, enslaving and even devouring demons. His three skill trees are <b>Chaos</b>, <b>Eldritch</b> and <b>Demon</b>.") + '</p>\n' \
             '<div class="callout tip"><b>' + bi("定位：", "Role:") + '</b>' \
@@ -1475,7 +1600,7 @@ def warlock():
     return _class_page("术士 Warlock", "c:warlock", intro, trees, builds, tips, "druid.html", "德鲁伊 Druid", "assassin.html", "刺客 Assassin")
 
 def assassin():
-    intro = '<h1><span class="zt"><span class="zc">刺客 </span><span class="ec">Assassin</span></span></h1>\n' \
+    intro = '<h1><span class="zt"><span class="zc">刺客 </span><span class="ec" lang="en">Assassin</span></span></h1>\n' \
             '<p>' + bi("刺客是陷阱与武学的宗师。Trapsin（陷阱刺客）用闪电/死亡陷阱远程清场，是最强的 solo 通关流派之一；而 Mosaic 武学刺客凭借新符文之语实现了「永久蓄力」，化身全屏元素风暴，是当前版本的顶级战力。",
                        "The Assassin is the master of traps and martial arts. A Trapsin clears screens at range with Lightning and Death Sentries and is one of the safest solo-clearing builds; the Mosaic martial-arts Assassin uses the new runeword to make charges permanent, becoming a screen-wide elemental storm and a top-tier force in the current patch.") + '</p>\n' \
             '<div class="callout tip"><b>' + bi("定位：", "Role:") + '</b>' \
@@ -1565,7 +1690,9 @@ def _guide_page(title, active, body_inner):
             break
     body = '<div class="breadcrumb"><a href="../index.html">' + bi("首页", "Home") + '</a> / ' \
            + bi("攻略", "Guides") + ' / ' + bi(_gn, _ge) + '</div>\n' + body_inner
-    return page(_gn + " " + _ge + " · 暗黑 II 攻略", 1, body, active, True)
+    return page(_gn.replace(" & ", "与") + " · 暗黑破坏神 II 攻略站", 1, body, active, True,
+                desc=GUIDE_DESC.get(_gid, SITE_DESC), en_t=_ge + " | Diablo II: Resurrected Guide",
+                keywords=GUIDE_KW.get(_gid, HOME_KW))
 
 def g_runewords():
     rows = [
@@ -1589,7 +1716,7 @@ def g_runewords():
         ("Death's Web", "Vex + Hel + El + Eld + Zod + Eth", bi("6 孔 死灵法杖", "6-socket Necro Head"), bi("+2 毒骨、敌方毒抗 -50%，毒/骨死灵核心。", "+2 poison/bone and -50% enemy poison resist — the core weapon for poison and bone Necromancers.")),
     ]
     tr = "".join("<tr><td><b>%s</b></td><td><code>%s</code></td><td>%s</td><td>%s</td></tr>" % r for r in rows)
-    body = '<h1><span class="zt"><span class="zc">符文之语图鉴 </span><span class="ec">Runewords</span></span></h1>\n' \
+    body = '<h1><span class="zt"><span class="zc">符文之语图鉴 </span><span class="ec" lang="en">Runewords</span></span></h1>\n' \
            '<p>' + bi("符文之语是将特定符文按顺序排列镶嵌到带孔装备中激活的强大词缀。下表汇集 D2R 当前版本最具代表性的符文之语，包括 2.4–2.6 赛季新增与经典终局装备。",
                       "Runewords are powerful affixes you unlock by socketing specific runes in the right order into a socketed item. The table below collects the most representative runewords of the current D2R patch, including the season 2.4–2.6 additions and classic endgame gear.") + '</p>\n' \
            '<div class="callout info"><b>' + bi("提示：", "Tip:") + '</b>' \
@@ -1606,7 +1733,7 @@ def g_runewords():
     return _guide_page("符文之语图鉴", "g:runewords", body)
 
 def g_leveling():
-    body = '<h1><span class="zt"><span class="zc">练级与开荒 </span><span class="ec">Leveling</span></span></h1>\n' \
+    body = '<h1><span class="zt"><span class="zc">练级与开荒 </span><span class="ec" lang="en">Leveling</span></span></h1>\n' \
            '<p>' + bi("从 1 级到 99 的高效路线，结合经典刷点与 Terror Zones（恐怖地带）。新手建议先用法师/召唤死灵/祝福之锤开荒，积累装备与符文。",
                       "An efficient route from level 1 to 99, mixing classic farming spots with Terror Zones. Beginners should start with a Sorceress, summon Necromancer or Hammerdin to stockpile gear and runes.") + '</p>\n' \
            '<h2 class="section-id" id="route">' + bi("分阶段路线", "Phased Route") + '</h2>\n<div class="card">\n<table><thead><tr><th>' + bi("阶段", "Phase") + '</th><th>' + bi("推荐地点", "Recommended Spot") + '</th><th>' + bi("要点", "Notes") + '</th></tr></thead><tbody>' \
@@ -1647,7 +1774,7 @@ def g_leveling():
     return _guide_page("练级与开荒", "g:leveling", body)
 
 def g_terror():
-    body = '<h1><span class="zt"><span class="zc">恐怖地带 </span><span class="ec">Terror Zones</span></span> &amp; <span class="zt"><span class="zc">破免护符 </span><span class="ec">Sunder Charms</span></span></h1>\n' \
+    body = '<h1><span class="zt"><span class="zc">恐怖地带 </span><span class="ec" lang="en">Terror Zones</span></span> &amp; <span class="zt"><span class="zc">破免护符 </span><span class="ec" lang="en">Sunder Charms</span></span></h1>\n' \
            '<p>' + bi("2.5+ 版本的两大核心机制，彻底改变了 D2R 的 farm 与流派多样性。",
                       "Two core mechanics from patch 2.5+ that completely changed D2R farming and build diversity.") + '</p>\n' \
            '<h2 class="section-id" id="tz">' + bi("Terror Zones 恐怖地带", "Terror Zones") + '</h2>\n<div class="card"><ul class="clean">' \
@@ -1688,7 +1815,7 @@ def g_terror():
     return _guide_page("恐怖地带 & Sunder", "g:terror-zones", body)
 
 def g_uber():
-    body = '<h1><span class="zt"><span class="zc">Uber 终局内容 </span><span class="ec">Uber Endgame</span></span></h1>\n' \
+    body = '<h1><span class="zt"><span class="zc">Uber 终局内容 </span><span class="ec" lang="en">Uber Endgame</span></span></h1>\n' \
            '<p>' + bi("D2R 的顶级 PvM 挑战：超级 boss 掉落毁灭（Annihilus）与小护身符（Torch），是终局玩家的标配。",
                       "The top PvM challenge in D2R: super bosses drop the Annihilus and Hellfire Torch — staples for every endgame player.") + '</p>\n' \
            '<h2 class="section-id" id="clone">' + bi("Diablo Clone 克隆", "Diablo Clone") + '</h2>\n<div class="card"><ul class="clean">' \
@@ -1719,7 +1846,7 @@ def g_uber():
     return _guide_page("Uber 终局", "g:uber", body)
 
 def g_tips():
-    body = '<h1><span class="zt"><span class="zc">综合技巧 </span><span class="ec">Tips</span></span></h1>\n' \
+    body = '<h1><span class="zt"><span class="zc">综合技巧 </span><span class="ec" lang="en">Tips</span></span></h1>\n' \
            '<p>' + bi("零散但关键的高手细节，覆盖重置、配方、交易与生存。",
                       "Scattered but crucial expert details covering respecs, recipes, trading and survival.") + '</p>\n' \
            '<div class="card"><h3>' + bi("① 重置与洗点", "1 · Respec & Resets") + '</h3><ul class="clean">' \
@@ -1795,7 +1922,7 @@ def g_farming():
         (bi("合成 CB 手套", "Craft CB gloves"), bi("Blood 手套配方：4 号 + 完美红宝石 + 任意珠宝 + 重手套，可出 10% CB + 吸血/力量，成本极低、CB 值高", "Blood glove recipe: Amn (#4) + perfect ruby + any jewel + heavy gloves can roll 10% CB + life steal/strength at very low cost with high CB value")),
     ]
     da = "".join("<li><b>%s：</b>%s</li>" % (k, v) for k, v in drac_alt)
-    body = '<h1><span class="zt"><span class="zc">速刷与 MF 指南 </span><span class="ec">Farming</span></span></h1>\n' \
+    body = '<h1><span class="zt"><span class="zc">速刷与 MF 指南 </span><span class="ec" lang="en">Farming</span></span></h1>\n' \
            '<p>' + bi("本页内容整理自项目内文档（MF.md / 卓古拉之握.md），聚焦<strong>通关后纯冰法速刷</strong>与<strong>暗金（卓古拉之握）速刷路线</strong>，是实战向的刷宝手册。MF（Magic Find，魔法寻获）越高，亮金/套装/符文掉率越高，但会牺牲部分生存与输出，需平衡。",
                       "This page is compiled from the project docs (MF.md / Dracul's Grasp.md), focusing on <strong>post-game pure-cold-Sorc farming</strong> and <strong>the unique (Dracul's Grasp) farming route</strong> — a practical loot guide. Higher MF (Magic Find) raises rare/set/rune drop rates, but trades away some survivability and damage, so balance it.") + '</p>\n' \
            '<div class="callout info"><b>' + bi("核心思路：", "Core idea:") + '</b>' + bi("练一个纯冰法师（暴风雪/冰封球）→ 力量刚好穿装备、其余全血、格挡 75%、MF 300+。先用冰免怪少的 85 场景起量，再用 Infinity 佣兵破冰免，最后靠 Sunder/副手换装把 MF 顶到 450–550。<b>3.3 补丁提醒：</b>破免在非地狱难度不再随 MF 掉落，且 Herald 掉率完全不吃 MF，本季要把<b>清场速度与 Herald 层数</b>排在 MF 数字前面。",
@@ -1839,6 +1966,29 @@ def g_farming():
            '<div class="pager"><a href="../index.html"><small>' + bi("返回", "Back") + '</small>' + bi("首页", "Home") + '</a><a href="tips.html"><small>' + bi("上一攻略", "Prev Guide") + '</small>' + bi("综合技巧", "Tips") + '</a></div>'
     return _guide_page("速刷与 MF 指南", "g:farming", body)
 
+FAVICON_SVG = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#0c0a09"/><polygon points="32,7 40,25 59,25 44,37 50,57 32,45 14,57 20,37 5,25 24,25" fill="none" stroke="#c8a24a" stroke-width="3"/><circle cx="32" cy="32" r="5.5" fill="#a3302e"/></svg>
+'''
+
+def seo_files():
+    """robots.txt 与 sitemap.xml（每个页面单独一条 URL）。"""
+    today = datetime.date.today().isoformat()
+    entries = [("", "1.0", "weekly")]
+    for cid, cn, en in CLASS_LIST:
+        entries.append(("classes/" + cid + ".html", "0.8", "monthly"))
+    for gid, name, en in GUIDE_LIST:
+        entries.append(("guides/" + gid + ".html", "0.8", "monthly"))
+    locs = ["  <url>\n    <loc>%s%s</loc>\n    <lastmod>%s</lastmod>\n"
+            "    <changefreq>%s</changefreq>\n    <priority>%s</priority>\n  </url>"
+            % (SITE_URL, rel, today, freq, prio) for rel, prio, freq in entries]
+    sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+               + "\n".join(locs) + "\n</urlset>\n")
+    robots = ("User-agent: *\nAllow: /\n\n"
+              "# 私人笔记库与构建脚本不出现在搜索结果中\n"
+              "Disallow: /diablo2.logseq/\nDisallow: /build_site.py\n\n"
+              "Sitemap: " + SITE_URL + "sitemap.xml\n")
+    return sitemap, robots
+
 # ---------------------------------------------------------------------------
 # Write all files
 # ---------------------------------------------------------------------------
@@ -1847,6 +1997,9 @@ def write(path, content):
         f.write(content)
 
 write(os.path.join(OUT, "index.html"), home())
+write(os.path.join(OUT, "favicon.svg"), FAVICON_SVG)
+write(os.path.join(OUT, "robots.txt"), seo_files()[1])
+write(os.path.join(OUT, "sitemap.xml"), seo_files()[0])
 write(os.path.join(OUT, "css", "style.css"), CSS)
 write(os.path.join(OUT, "js", "main.js"), JS)
 write(os.path.join(OUT, "classes", "amazon.html"), amazon())

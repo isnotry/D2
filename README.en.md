@@ -10,9 +10,9 @@
 
 > A bilingual (Chinese/English) static guide site for Diablo II: Resurrected builds and skill allocations — zero dependencies, zero build, just open it.
 
-![Screenshot](https://cdn.jsdelivr.net/gh/isnotry/d2@main/docs/screenshot-en.png)
+![Screenshot](https://cdn.jsdelivr.net/gh/isnotry/D2@main/docs/screenshot-en.png)
 
-**[Use it online](https://isnotry.github.io/d2/)**
+**[Use it online](https://kingsir.work/D2/)**
 
 ---
 
@@ -36,12 +36,12 @@ Pure HTML + CSS + vanilla JS — no framework, no backend, no third-party librar
 
 ### Use it online
 
-Click **[Use it online](https://isnotry.github.io/d2/)** to open it — nothing to install, no sign-up.
+Click **[Use it online](https://kingsir.work/D2/)** to open it — nothing to install, no sign-up. There is also a **[GitHub Pages mirror](https://isnotry.github.io/D2/)**, which redirects to the main site.
 
 ### Run it locally
 
 ```bash
-git clone git@github.com:isnotry/d2.git
+git clone git@github.com:isnotry/D2.git
 cd d2
 python3 -m http.server 8000
 # Open http://localhost:8000

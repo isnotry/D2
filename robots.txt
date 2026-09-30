@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# 私人笔记库与构建脚本不出现在搜索结果中
+Disallow: /diablo2.logseq/
+Disallow: /build_site.py
+
+Sitemap: https://kingsir.work/D2/sitemap.xml

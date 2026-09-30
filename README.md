@@ -10,9 +10,9 @@
 
 > Diablo II: Resurrected 全职业加点与流派攻略的中英双语静态站，零依赖零构建，打开即用。
 
-![界面截图](https://cdn.jsdelivr.net/gh/isnotry/d2@main/docs/screenshot.png)
+![界面截图](https://cdn.jsdelivr.net/gh/isnotry/D2@main/docs/screenshot.png)
 
-**[在线使用](https://isnotry.github.io/d2/)**
+**[在线使用](https://kingsir.work/D2/)**
 
 ---
 
@@ -36,12 +36,12 @@
 
 ### 在线使用
 
-点击 **[在线使用](https://isnotry.github.io/d2/)** 即可打开，无需安装、不用注册。
+点击 **[在线使用](https://kingsir.work/D2/)** 即可打开，无需安装、不用注册；备用入口为 **[GitHub Pages 镜像](https://isnotry.github.io/D2/)**（会自动跳转到主站点）。
 
 ### 本地使用
 
 ```bash
-git clone git@github.com:isnotry/d2.git
+git clone git@github.com:isnotry/D2.git
 cd d2
 python3 -m http.server 8000
 # 打开 http://localhost:8000

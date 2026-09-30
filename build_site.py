@@ -454,7 +454,7 @@ def page(title, depth, body, active, sub_layout=False):
     foot = '<footer><div class="wrap"><span>' + bi("暗黑破坏神 II：复活 · 静态攻略站", "Diablo II: Resurrected · Static Guide") + '</span>' \
            '<span>' + bi("基于 D2R 最新 meta（Sunder Charms / Terror Zones / Mosaic 等）整理", "Built around the latest D2R meta (Sunder Charms / Terror Zones / Mosaic Runewords, Ladder seasons).") + '</span></div>' \
            '<div class="wrap disc"><span>' + bi("非官方粉丝站 · 与暴雪娱乐无关。Diablo / Diablo II: Resurrected 为 Blizzard Entertainment, Inc. 的商标，本站仅作指示性引用。", "Unofficial fan site, not affiliated with Blizzard Entertainment. Diablo / Diablo II: Resurrected are trademarks of Blizzard Entertainment, Inc.; used here for identification only.") + '</span><br />' \
-           + '<span class="zt"><a class="zc repo" href="https://github.com/isnotry/d2" target="_blank" rel="noopener noreferrer">GitHub 开源仓库</a><a class="ec repo" href="https://github.com/isnotry/d2" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></span></div></footer>'
+           + '<span class="zt"><a class="zc repo" href="https://github.com/isnotry/D2" target="_blank" rel="noopener noreferrer">GitHub 开源仓库</a><a class="ec repo" href="https://github.com/isnotry/D2" target="_blank" rel="noopener noreferrer">Open source on GitHub</a></span></div></footer>'
     raw_title = title
     title = zh(title)
     body = zh(body)

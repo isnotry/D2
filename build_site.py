@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 """Generate a static, content-rich Diablo II: Resurrected guide site (v2, concatenation-based)."""
 import os
+import sys
 import datetime
 
 OUT = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, OUT)
 os.makedirs(os.path.join(OUT, "css"), exist_ok=True)
 os.makedirs(os.path.join(OUT, "js"), exist_ok=True)
 os.makedirs(os.path.join(OUT, "classes"), exist_ok=True)
 os.makedirs(os.path.join(OUT, "guides"), exist_ok=True)
+
+# 收藏编年史数据（自动生成，见 tools_build_chronicle.py）
+from d2_chronicle_data import RUNEWORDS, SETS, UNIQUES, RUNE_NEED, RUNE_TIERS
 
 # ---------------------------------------------------------------------------
 # 术语翻译表（大陆/国服版：中文为主，英文为辅）
@@ -169,6 +174,28 @@ ZH_PAIRS = [
     ("Combat Masteries", "战斗精通"), ("Warcries", "战吼"), ("Elemental", "元素"),
     ("Shape Shifting", "变身"), ("Traps", "陷阱"), ("Martial Arts", "武学"),
     ("Shadow Disciplines", "影子训练"),
+    # —— 2026-10-06 补充：收藏编年史属性里的技能名 / 职业名 ——
+    # 属性描述由 d2data 的技能 param 生成，术语表覆盖不到时中文模式下只有英文。
+    # ⚠️ 含 Fire/Cold 等短词的长名（Ring of Fire / Resist Fire）必须整条列出：
+    #    否则会被拆成「Ring of」+「火焰」，渲染成半截英文。
+    # ⚠️ d2data 里部分技能名连写或拼错（IronGolem / BloodGolem / Wearbear），
+    #    与词表里的规范拼写是不同 key，需各列一条。
+    ("Ring of Fire", "火环"), ("Resist Fire", "抗火"), ("Fire Wall", "火墙"),
+    ("Holy Freeze", "神圣冰冻"), ("Chilling Armor", "寒冰装甲"),
+    ("Charged Bolt", "充能弹"), ("Blaze", "烈焰"), ("Raven", "乌鸦"),
+    ("Summon Spirit Wolf", "召唤幽灵狼"),
+    ("Mark of the Wolf", "狼之印记"), ("Mark of the Bear", "熊之印记"),
+    ("Wearbear", "熊人"),
+    ("IronGolem", "钢铁石魔"), ("BloodGolem", "血魔"), ("ClayGolem", "黏土石魔"),
+    ("Confuse", "混乱"), ("Terror", "恐惧"), ("Weaken", "削弱"),
+    ("Howl", "嚎叫"), ("Quickness", "迅捷"), ("Psychic Ward", "心灵守护"),
+    ("Miasma Chains", "瘴气锁链"),
+    ("Sigil Death", "死亡印记"), ("Sigil Lethargy", "迟滞印记"),
+    ("Delerium Change", "迪勒瑞姆变身"), ("enchant", "附魔"),
+    # 职业名（属性里的「XX 技能等级」）
+    ("Amazon", "亚马逊"), ("Assassin", "刺客"), ("Barbarian", "野蛮人"),
+    ("Druid", "德鲁伊"), ("Necromancer", "亡灵法师"), ("Paladin", "圣骑士"),
+    ("Sorceress", "法师"), ("Warlock", "术士"),
 ]
 
 import re as _re
@@ -183,16 +210,43 @@ for _en, _zh in sorted(ZH_PAIRS, key=lambda kv: -len(kv[0])):
 # 防止 build_card()/page() 多次 zh() 造成嵌套 span。
 _ZH_RE = _re.compile(r"(?<!zc\"\>)(?<!ec\"\>)(?:" + "|".join(_ZH_PATS) + r")")
 
+# 两类区域必须原样保留，不能被术语表改写：
+#   1) localStorage 的 key / 搜索索引 —— data-* 属性值，被 span 污染后打勾状态就存不下来；
+#   2) 条目译名 —— data-zh-is-name 标记的 span，译名已由数据层给定，
+#      再被术语表包一层会渲染成「谜团 谜团 Enigma」。
+# 做法：先把这两类片段挖成占位符，整串替换完再原样填回。
+_ATTR_RE = _re.compile(r'\s(?:data-[a-z-]+|placeholder)="[^"]*"')
+# 注意：条目名 span 自带 data-zh-is-name 属性，必须在 _ATTR_RE 之前整段挖走，
+# 否则属性先被挖成占位、span 结构断裂，这条就匹配不到了。
+_NAME_SPAN_RE = _re.compile(r'<span[^>]*data-zh-is-name="1"[^>]*>[^<]*</span>')
+_HOLE_RE = _re.compile(r'\x00(\d+)\x00')
+
 def zh(text):
-    """将英文术语包成可切换的「中文/英文」双 span（默认中文，加 html.en 切英文）。"""
+    """将英文术语包成可切换的「中文/英文」双 span（默认中文，加 html.en 切英文）。
+
+    data-* / placeholder 属性值与 data-zh-is-name 标记的译名原样保留，
+    其余文本节点照常做术语替换（保持既有渲染行为不变）。
+    """
     if not text:
         return text
+    holes = []
+    def _stash(m):
+        holes.append(m.group(0))
+        return "\x00%d\x00" % (len(holes) - 1)
+    # 顺序要紧：先挖译名 span（内含 data-zh-is-name 属性），再挖剩余属性。
+    if 'data-zh-is-name' in text:
+        text = _NAME_SPAN_RE.sub(_stash, text)
+    if '="' in text:
+        text = _ATTR_RE.sub(_stash, text)
     def _repl(m):
         for _n, (_z, _e) in _ZH_MAP.items():
             if m.group(_n) is not None:
                 return '<span class="zt"><span class="zc">%s </span><span class="ec" lang="en">%s</span></span>' % (_z, _e)
         return m.group(0)
-    return _ZH_RE.sub(_repl, text)
+    text = _ZH_RE.sub(_repl, text)
+    if holes:
+        text = _HOLE_RE.sub(lambda m: holes[int(m.group(1))], text)
+    return text
 
 def bi(zh_text, en_text):
     """双语块：默认中文（.zc），EN 模式显示英文（.ec）为主文本。
@@ -238,12 +292,52 @@ _RUNE_RE = _re.compile(
         _re.escape(k) for k in sorted(RUNE_ORDER, key=lambda x: -len(x))
     )
 )
+# 已经编过号的「#24 Ist」整段（含符文名一起捕获）挖走，避免再加一遍。
+# 必须连符文名一起吃掉，只挖「#24 」的话占位符后紧跟的 Ist 仍会被再匹配。
+_RUNE_DONE_RE = _re.compile(
+    r"#\d+\s+(%s)\b" % "|".join(
+        _re.escape(k) for k in sorted(RUNE_ORDER, key=lambda x: -len(x))
+    )
+)
+# 畸形串防护：数字紧贴符文名（如「#1 El9921222」）视为已在编号语境，不再加号
+_RUNE_JUNK_RE = _re.compile(r"#\d+\s*(?:%s)(?=[0-9])" % "|".join(
+    _re.escape(k) for k in sorted(RUNE_ORDER, key=lambda x: -len(x))
+))
 
 def rune_no(text):
-    """给符文名加 #编号（如 Ist -> #24 Ist，数字在前）。"""
+    """给符文名加 #编号（如 Ist -> #24 Ist，数字在前）。属性值与译名区域跳过。
+
+    已经是「#24 Ist」形态的不重复加编号 —— page() 里可能对同一段文本多次调用。
+    """
     if not text:
         return text
-    return _RUNE_RE.sub(lambda m: "#%d %s" % (RUNE_ORDER[m.group(1)], m.group(1)), text)
+    def _sub(s):
+        # 已编号的整段（含符文名）先挖走，剩下的才加
+        keep = []
+        def _hide(m):
+            keep.append(m.group(0))
+            return "\x01%d\x01" % (len(keep) - 1)
+        s = _RUNE_DONE_RE.sub(_hide, s)
+        s = _RUNE_JUNK_RE.sub(_hide, s)
+        s = _RUNE_RE.sub(lambda m: "#%d %s" % (RUNE_ORDER[m.group(1)], m.group(1)), s)
+        for i, seg in enumerate(keep):
+            s = s.replace("\x01%d\x01" % i, seg)
+        return s
+    sub = _sub
+    if '="' not in text and 'data-zh-is-name' not in text:
+        return sub(text)
+    holes = []
+    def _stash(m):
+        holes.append(m.group(0))
+        return "\x00%d\x00" % (len(holes) - 1)
+    if 'data-zh-is-name' in text:
+        text = _NAME_SPAN_RE.sub(_stash, text)
+    if '="' in text:
+        text = _ATTR_RE.sub(_stash, text)
+    text = sub(text)
+    if holes:
+        text = _HOLE_RE.sub(lambda m: holes[int(m.group(1))], text)
+    return text
 
 # ---------------------------------------------------------------------------
 # Shared CSS
@@ -365,10 +459,193 @@ footer .repo:hover{color:var(--gold)}
 .pager a:hover{text-decoration:none;border-color:var(--gold);color:var(--gold2)}
 .pager a small{display:block;color:var(--muted);font-size:12px}
 .section-id{scroll-margin-top:70px}
+
+/* ==========================================================================
+   收藏编年史 Chronicle
+   ========================================================================== */
+.ch-hero{background:linear-gradient(180deg,#1d130b 0%,#0c0a09 100%);border-bottom:1px solid var(--line)}
+.ch-hero .wrap{padding:34px 18px 26px}
+.ch-hero h1{margin:.1em 0 .3em;font-size:clamp(24px,4vw,38px)}
+.ch-hero .sub{color:var(--muted);max-width:820px;margin:0 0 18px;font-size:15px}
+
+.ch-total{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--gold);border-radius:14px;padding:16px 20px;margin:6px 0 20px}
+.ch-total .num{font-family:"Cinzel",Georgia,serif;font-size:30px;color:var(--gold2);font-weight:700;line-height:1}
+.ch-total .num small{font-size:15px;color:var(--muted);font-weight:400}
+.ch-total .meta{color:var(--muted);font-size:13px}
+.ch-total .meta b{color:var(--ink);display:block;font-size:14px;font-family:inherit}
+
+.ch-bar{height:10px;background:#0a0807;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex:1;min-width:180px}
+.ch-bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--blood2),var(--gold));border-radius:6px;transition:width .3s ease}
+
+.ch-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 18px;position:sticky;top:56px;z-index:20;background:var(--bg);padding:10px 0}
+.ch-toolbar input[type=search]{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:8px 12px;font-size:14px;font-family:inherit;min-width:180px;flex:1;max-width:280px}
+.ch-toolbar input[type=search]:focus{outline:none;border-color:var(--gold)}
+.ch-tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:7px 13px;cursor:pointer;font-size:13px;font-family:inherit}
+.ch-tab:hover{color:var(--ink);border-color:var(--gold)}
+.ch-tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:var(--bg);font-weight:700;border-color:var(--gold)}
+.ch-reset{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:7px 13px;cursor:pointer;font-size:13px;font-family:inherit}
+.ch-reset:hover{color:var(--bad);border-color:var(--bad)}
+.ch-reset.armed{color:var(--bg);background:var(--bad);border-color:var(--bad);font-weight:700}
+
+/* 导出 / 导入 */
+.ch-io{display:inline-flex;gap:8px;position:relative;padding-left:10px;border-left:1px solid var(--line)}
+.ch-btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:8px;
+  padding:7px 13px;cursor:pointer;font-size:13px;font-family:inherit;line-height:1.35;display:inline-flex;align-items:center}
+.ch-btn:hover{color:var(--ink);border-color:var(--gold)}
+.ch-btn.primary{background:linear-gradient(180deg,var(--gold2),var(--gold));color:var(--bg);font-weight:700;border-color:var(--gold)}
+.ch-btn.ghost{background:transparent}
+.ch-io-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:-8px 0 18px;padding:11px 14px;
+  border:1px solid var(--gold);border-radius:10px;background:linear-gradient(180deg,#1d1710,var(--bg2));
+  font-size:13px;color:#cbbda4;line-height:1.5}
+.ch-io-bar[hidden]{display:none}
+.ch-io-msg{flex:1;min-width:220px}
+.ch-io-acts{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+
+.ch-sec{margin:0 0 30px}
+.ch-sec > header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.ch-sec h2{margin:0;font-size:22px}
+.ch-sec .cnt{color:var(--muted);font-size:13px;font-family:"Cinzel",Georgia,serif}
+.ch-sec .grow{margin-left:auto;width:150px;height:8px}
+
+.ch-grid{display:grid;gap:10px}
+.ch-set-head{display:flex;align-items:flex-start;gap:11px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--gold);border-radius:11px;padding:12px 14px;margin-top:16px}
+.ch-set-head .ch-name{font-size:16px}
+.ch-pieces{margin:10px 0 0 26px}
+.ch-item{display:flex;align-items:flex-start;gap:11px;background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:11px;padding:11px 14px;cursor:pointer;transition:.15s}
+.ch-item:hover{border-color:var(--gold)}
+.ch-item.done{border-color:var(--good);background:linear-gradient(180deg,#16201310,var(--bg2));opacity:.62}
+.ch-item.done .ch-name{text-decoration:line-through;color:var(--muted)}
+.ch-box{flex:0 0 auto;width:19px;height:19px;border:2px solid var(--gold);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--bg);font-weight:700}
+.ch-item.done .ch-box{background:var(--good);border-color:var(--good)}
+.ch-box span{opacity:0;line-height:1}
+.ch-item.done .ch-box span{opacity:1}
+.ch-main{min-width:0;flex:1}
+.ch-name{font-size:15px;color:var(--ink);font-weight:600;line-height:1.45}
+.ch-name .zt .zc{color:var(--gold2);font-weight:700}
+.ch-sub{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55}
+.ch-sub code{font-size:11.5px;background:#000;padding:0 5px;border-radius:4px;color:var(--gold2)}
+.ch-sub .rw{color:#8fb8d8}
+.ch-props{margin-top:5px;font-size:12px;color:#9a8b73;line-height:1.6}
+.ch-props span{display:inline-block;background:#201a13;border:1px solid var(--line);border-radius:5px;padding:0 6px;margin:2px 4px 0 0}
+.ch-req{flex:0 0 auto;font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:20px;padding:1px 8px;margin-top:2px;white-space:nowrap}
+.ch-ladder{font-size:11px;color:#e8a04a;border:1px solid #5a4326;border-radius:5px;padding:0 5px;margin-left:6px}
+.ch-eth{font-size:11px;color:#7fc8e8;border:1px solid #2c4d5a;border-radius:5px;padding:0 5px;margin-left:5px}
+
+.ch-subgrp{margin:14px 0 8px;font-size:14px;color:var(--gold);font-family:"Cinzel",Georgia,serif;letter-spacing:.5px}
+.ch-bonus{font-size:12.5px;color:#b9a88c;background:#1a150f;border:1px dashed var(--line);border-radius:8px;padding:7px 11px;margin-top:6px}
+.ch-empty{color:var(--muted);font-size:14px;padding:20px 0;text-align:center}
+
+/* 符文需求统计 */
+.rune-need-card{padding-top:6px}
+.rune-need-card .fold-body{margin-top:12px}
+.fold-toggle{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;
+  padding:12px 4px;color:var(--gold2);cursor:pointer;font-family:inherit;font-size:17px;
+  font-weight:700;text-align:left;line-height:1.3}
+.fold-toggle:hover{color:var(--gold)}
+.fold-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+.fold-arrow{width:0;height:0;flex:0 0 auto;border-left:6px solid currentColor;
+  border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;
+  transition:transform .2s ease;transform-origin:38% 50%}
+.fold-toggle[aria-expanded="false"] .fold-arrow{transform:rotate(-90deg)}
+.fold-title{flex:0 0 auto}
+.fold-hint{margin-left:auto;font-size:12px;font-weight:400;color:var(--muted);text-align:right}
+.fold-body{border-top:1px dashed var(--line);padding-top:12px}
+.rune-need-card p{margin:0 0 14px;font-size:14px;color:#b9a88c;line-height:1.75}
+.rune-need-card .callout{margin:12px 0 0}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.rune-need{width:100%;border-collapse:collapse;font-size:13.5px;margin:0}
+table.rune-need th,table.rune-need td{border:1px solid var(--line);padding:6px 8px;text-align:center;white-space:nowrap}
+table.rune-need th:first-child,table.rune-need td:first-child{text-align:left}
+table.rune-need thead th{background:var(--panel2);color:var(--gold2);font-family:"Cinzel",Georgia,serif;font-weight:600}
+table.rune-need th.tier-head{border-left:1px solid var(--gold)}
+table.rune-need .tier-subhead th{background:#241d16;color:var(--muted);font-size:12px;padding:3px 8px;font-weight:500}
+table.rune-need .tier-subhead th:first-child,table.rune-need .tier-subhead th:nth-child(2),table.rune-need .tier-subhead th:nth-child(3){background:transparent;border:none}
+table.rune-need tbody td[data-sk]{border-left:1px solid var(--gold);color:#9a8b73;font-size:12.5px}
+table.rune-need code.rn{background:#000;color:#8fb8d8;padding:1px 6px;border-radius:4px;font-size:12.5px}
+table.rune-need td.num{font-family:"Cinzel",Georgia,serif;font-weight:700;font-size:15px;color:var(--ink)}
+table.rune-need td.num.left{color:var(--gold2)}
+table.rune-need tr.done td.num.left{color:var(--good)}
+table.rune-need td.num.left.zero{color:#5f564a;text-decoration:line-through}
+table.rune-need tr.done{background:rgba(111,174,91,.06)}
+.ch-bar.tiny{height:5px;min-width:70px;width:100%;display:block}
+td.col-bar{width:90px;padding:4px 8px}
+.tier-sum{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;font-size:12.5px;color:var(--muted)}
+.tier-sum b{color:var(--gold2);font-family:"Cinzel",Georgia,serif;font-size:14px}
+.tier-sum .ts{padding:4px 10px;background:#1a150f;border:1px solid var(--line);border-radius:20px}
+.ch-io input[type=file]{display:none}
+
+
+@media(max-width:820px){
+  .ch-toolbar{position:static}
+  .ch-total{gap:12px;padding:14px}
+  .ch-total .num{font-size:24px}
+  .ch-sec .grow{margin-left:0;width:100%}
+  .ch-req{display:none}
+  table.rune-need{font-size:12.5px}
+  table.rune-need th,table.rune-need td{padding:4px 6px}
+}
 '''
 
 JS = r'''
-// 中英文切换：默认中文，点击切英文并记住选择
+// ==========================================================================
+// 站点本地存储：全站共用一份 d2r_site_v1
+//   { lang: "zh"|"en", ui: { 折叠状态... }, chronicle: { 条目id: 时间戳 } }
+// 旧的 lang / d2r_chronicle_v1 会自动迁移进来，迁移后不再单独写。
+// ==========================================================================
+var SiteStore=(function(){
+  var KEY="d2r_site_v1";
+  var mem=null;                 // 内存缓存，避免反复 JSON.parse
+  function blank(){return {lang:"zh",ui:{},chronicle:{}};}
+  function migrate(raw){
+    var d=blank();
+    if(!raw||typeof raw!=="object")return d;
+    if(raw.lang==="en")d.lang="en";
+    if(raw.ui&&typeof raw.ui==="object")d.ui=raw.ui;
+    if(raw.chronicle&&typeof raw.chronicle==="object")d.chronicle=raw.chronicle;
+    return d;
+  }
+  function load(){
+    if(mem)return mem;
+    var raw=null;
+    try{raw=localStorage.getItem(KEY);}catch(e){}
+    if(raw){
+      try{mem=migrate(JSON.parse(raw));}catch(e){mem=blank();}
+    }else{
+      mem=blank();
+      // 迁移旧key
+      try{
+        var l=localStorage.getItem("lang");
+        if(l==="en")mem.lang="en";
+        var c=localStorage.getItem("d2r_chronicle_v1");
+        if(c){var o=JSON.parse(c);if(o&&typeof o==="object")mem.chronicle=o;}
+      }catch(e){}
+    }
+    return mem;
+  }
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(load()));}catch(e){}
+  }
+  return {
+    // 取整个对象（引用，可直接改后调 commit）
+    get:function(){return load();},
+    commit:save,
+    lang:function(){return load().lang;},
+    setLang:function(v){load().lang=v?"en":"zh";save();},
+    chronicle:function(){return load().chronicle;},
+    saveChronicle:function(){save();},
+    // 清空打勾记录：原地清空对象，**不要重新赋值**，
+    // 否则调用方持有的引用会脱钩，之后再打勾就写不回存储了。
+    resetChronicle:function(){
+      var c=load().chronicle, k=Object.keys(c);
+      for(var i=0;i<k.length;i++){delete c[k[i]];}
+      save();
+    },
+    ui:function(k){return load().ui[k];},
+    setUi:function(k,v){load().ui[k]=v;save();}
+  };
+})();
+
+// 中英文切换：默认中文，点击切英文并记住选择（存站点统一存储）
 (function(){
   var bar=document.querySelector("nav.topbar .wrap");
   if(bar){
@@ -376,9 +653,9 @@ JS = r'''
     btn.id="langToggle";btn.className="lang-toggle";
     btn.setAttribute("aria-label","切换中英文");
     bar.appendChild(btn);
-    var en=localStorage.getItem("lang")==="en";
+    var en=SiteStore.lang()==="en";
     var origTitle=document.title;
-    function set(v){document.documentElement.classList.toggle("en",v);localStorage.setItem("lang",v?"en":"");btn.textContent=v?"中文":"EN";document.title=v?(document.documentElement.getAttribute("data-en-title")||origTitle):origTitle;}
+    function set(v){document.documentElement.classList.toggle("en",v);SiteStore.setLang(v);btn.textContent=v?"中文":"EN";document.title=v?(document.documentElement.getAttribute("data-en-title")||origTitle):origTitle;}
     set(en);
     btn.addEventListener("click",function(){set(!document.documentElement.classList.contains("en"));});
   }
@@ -396,6 +673,595 @@ JS = r'''
   document.body.appendChild(b);
   window.addEventListener("scroll",function(){b.style.display=window.scrollY>400?"block":"none";});
   b.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"});});
+})();
+
+// ==========================================================================
+// 收藏编年史：打勾状态与界面折叠状态存站点统一存储 SiteStore（d2r_site_v1）
+// 纯本地浏览器，不上传任何服务器
+// ==========================================================================
+(function(){
+  var root=document.querySelector("[data-chronicle]");
+  if(!root)return;
+  var items=Array.prototype.slice.call(root.querySelectorAll(".ch-item"));
+  if(!items.length)return;
+
+  // 打勾状态（与全站共用同一份存档）
+  var state=SiteStore.chronicle();
+  function save(){SiteStore.saveChronicle();}
+
+  // 孔数分档表头（2/3/4/5/6 孔），给符文预算分档用。必须在 refresh 之前就绪。
+  var rwTierCounts=Array.prototype.slice.call(
+    (root.querySelector(".rune-need .tier-subhead")||{children:[]}).children
+  ).map(function(th){return parseInt(th.getAttribute("data-sk")||"",10)||0;}).filter(function(n){return n>=2&&n<=6;});
+
+  // 打勾/取消（用事件委托，动态筛选后依然有效）
+  root.addEventListener("click",function(ev){
+    var el=ev.target.closest(".ch-item");
+    if(!el||!root.contains(el))return;
+    var id=el.getAttribute("data-id");
+    if(!id)return;
+    // 套装头部是批量开关：一次勾/取消整套部件
+    if(el.getAttribute("data-role")==="set-all"){
+      var wrap=el.parentNode;
+      var kids=wrap?wrap.querySelectorAll(".ch-pieces .ch-item"):[];
+      var allOn=true;
+      for(var i=0;i<kids.length;i++){if(!state[kids[i].getAttribute("data-id")]){allOn=false;break;}}
+      for(var j=0;j<kids.length;j++){
+        var kid=kids[j],kidId=kid.getAttribute("data-id");
+        if(allOn){delete state[kidId];}else{state[kidId]=Date.now();}
+        kid.classList.toggle("done",!allOn);
+        kid.setAttribute("aria-checked",allOn?"false":"true");
+      }
+      if(allOn){delete state[id];}else{state[id]=Date.now();}
+      el.classList.toggle("done",!allOn);
+      el.setAttribute("aria-checked",allOn?"false":"true");
+      save();syncSetHeads();refresh();
+      return;
+    }
+    if(state[id]){delete state[id];}else{state[id]=Date.now();}
+    el.classList.toggle("done",!!state[id]);
+    el.setAttribute("aria-checked",state[id]?"true":"false");
+    save();
+    syncSetHeads();
+    refresh();
+  });
+
+  // 统计：按 data-cat 分组 + 总计（套装头是批量开关，不计入进度）
+  var counters={};
+  function refresh(){
+    var total=0,done=0;
+    counters={};
+    items.forEach(function(it){
+      if(it.getAttribute("data-role")==="set-all")return;
+      if(it.style.display==="none")return;      // 被搜索/筛选隐藏的不计入
+      var cat=it.getAttribute("data-cat")||"other";
+      counters[cat]=counters[cat]||{t:0,d:0};
+      counters[cat].t++;
+      total++;
+      if(state[it.getAttribute("data-id")]){counters[cat].d++;done++;}
+    });
+    var pct=total?Math.round(done/total*100):0;
+    var num=document.getElementById("chTotal");
+    if(num)num.firstChild.nodeValue=String(done);
+    var small=document.getElementById("chTotalOf");
+    if(small)small.textContent="/ "+total;
+    var meta=document.getElementById("chPct");
+    if(meta)meta.textContent=pct+"%";
+    var bar=document.getElementById("chBar");
+    if(bar)bar.style.width=pct+"%";
+    // 各分类进度
+    Object.keys(counters).forEach(function(cat){
+      var c=counters[cat];
+      var pct2=c.t?Math.round(c.d/c.t*100):0;
+      var e1=document.querySelector('[data-catbar="'+cat+'"]');
+      if(e1)e1.style.width=pct2+"%";
+      var e2=document.querySelector('[data-catnum="'+cat+'"]');
+      if(e2)e2.textContent=c.d+" / "+c.t;
+    });
+    refreshRuneBudget();
+  }
+
+  // 符文预算：已勾选的符文之语扣掉对应符文，算出每种符文「还缺几个」
+  var runeRows=Array.prototype.slice.call(root.querySelectorAll(".rune-need tbody tr"));
+  var runeFold=null;   // 折叠句柄，后面的 initFold 赋值；refreshRuneBudget 要用
+  var tierSumEl=document.getElementById("rwTierSum");
+  function refreshRuneBudget(){
+    if(!runeRows.length)return;
+    // 已完成条目涉及的符文（按出现次数累计）与按孔数分档
+    var used={}, usedTier={};
+    Array.prototype.slice.call(root.querySelectorAll('.ch-item[data-cat="rw"]')).forEach(function(it){
+      if(!state[it.getAttribute("data-id")])return;
+      var seq=(it.getAttribute("data-runes")||"").split(",").filter(Boolean);
+      var sk=it.getAttribute("data-sockets")||"0";
+      seq.forEach(function(rn){
+        used[rn]=(used[rn]||0)+1;
+        usedTier[sk+"-"+rn]=(usedTier[sk+"-"+rn]||0)+1;
+      });
+    });
+    runeRows.forEach(function(tr){
+      var rn=tr.getAttribute("data-rune");
+      var leftEl=tr.querySelector("td.num.left");
+      var totEl=tr.querySelector("td.num.tot");
+      var tot=parseInt(totEl.textContent,10)||0;
+      var left=Math.max(0,tot-(used[rn]||0));
+      leftEl.textContent=left;
+      leftEl.classList.toggle("zero",left===0);
+      tr.classList.toggle("done",left===0&&tot>0);
+      // 分档列也要扣减（第 4 列起是各孔数档位，末列是进度条）
+      var cells=tr.querySelectorAll("td[data-sk]");
+      cells.forEach(function(td){
+        var sk=td.getAttribute("data-sk")||"0";
+        var n=parseInt(td.textContent,10)||0;
+        td.textContent=Math.max(0,n-(usedTier[sk+"-"+rn]||0));
+      });
+      // 迷你进度条按完成比例
+      var bar=tr.querySelector(".ch-bar.tiny > i");
+      if(bar){bar.style.width=(tot?Math.round((tot-left)/tot*100):0)+"%";}
+    });
+    // 收起时在标题旁给个摘要：还缺几种符文、共多少个
+    if(runeFold&&runeFold.setHint){
+      var lack=0,sumLeft=0;
+      runeRows.forEach(function(tr){
+        var l=parseInt(tr.querySelector("td.num.left").textContent,10)||0;
+        if(l>0){lack++;sumLeft+=l;}
+      });
+      runeFold.setHint(lack?("还缺 "+lack+" 种 · "+sumLeft+" 个"):"已集齐");
+    }
+    // 顶部按孔数小结
+    if(tierSumEl){
+      var parts=[];
+      var rwItems=Array.prototype.slice.call(root.querySelectorAll('.ch-item[data-cat="rw"]'));
+      rwTierCounts.forEach(function(sk){
+        var inTier=rwItems.filter(function(x){return (x.getAttribute("data-sockets")||"")===String(sk);});
+        var dn=inTier.filter(function(x){return !!state[x.getAttribute("data-id")];}).length;
+        if(inTier.length)parts.push(sk+"孔 "+dn+"/"+inTier.length);
+      });
+      tierSumEl.innerHTML=parts.map(function(p){return '<span class="ts">'+p+"</span>";}).join("");
+    }
+  }
+
+  // 初始渲染勾选态；套装头按「部件是否集齐」自动同步
+  function syncSetHeads(){
+    Array.prototype.slice.call(root.querySelectorAll('[data-role="set-all"]')).forEach(function(head){
+      var wrap=head.parentNode;
+      var kids=wrap?wrap.querySelectorAll(".ch-pieces .ch-item"):[];
+      var allOn=kids.length>0;
+      for(var i=0;i<kids.length;i++){if(!state[kids[i].getAttribute("data-id")]){allOn=false;break;}}
+      var on=allOn||!!state[head.getAttribute("data-id")];
+      head.classList.toggle("done",on);
+      head.setAttribute("aria-checked",on?"true":"false");
+    });
+  }
+  // 按 state 重渲染所有勾选态（初始化 / 导入 / 清空后共用）
+  function renderAll(){
+    items.forEach(function(it){
+      var on=!!state[it.getAttribute("data-id")];
+      it.classList.toggle("done",on);
+      it.setAttribute("aria-checked",on?"true":"false");
+    });
+    syncSetHeads();
+  }
+  renderAll();
+
+  // 分类切换
+  var tabs=Array.prototype.slice.call(document.querySelectorAll(".ch-tab"));
+  var activeCat="all";
+  function applyFilter(){
+    var q=(document.getElementById("chSearch")||{}).value||"";
+    q=q.trim().toLowerCase();
+    items.forEach(function(it){
+      var catOk=(activeCat==="all"||it.getAttribute("data-cat")===activeCat);
+      var txt=(it.getAttribute("data-search")||"").toLowerCase();
+      var qOk=!q||txt.indexOf(q)>=0;
+      var show=catOk&&qOk;
+      it.style.display=show?"":"none";
+    });
+    // 隐藏无结果的分组标题
+    Array.prototype.slice.call(root.querySelectorAll(".ch-sec")).forEach(function(sec){
+      var any=Array.prototype.slice.call(sec.querySelectorAll(".ch-item")).some(function(x){return x.style.display!=="none";});
+      sec.style.display=any?"":"none";
+    });
+    Array.prototype.slice.call(root.querySelectorAll(".ch-subwrap")).forEach(function(w){
+      var any=Array.prototype.slice.call(w.querySelectorAll(".ch-item")).some(function(x){return x.style.display!=="none";});
+      w.style.display=any?"":"none";
+    });
+    refresh();
+  }
+  tabs.forEach(function(btn){
+    btn.addEventListener("click",function(){
+      tabs.forEach(function(b){b.classList.remove("on");});
+      btn.classList.add("on");
+      activeCat=btn.getAttribute("data-filter")||"all";
+      applyFilter();
+    });
+  });
+  var search=document.getElementById("chSearch");
+  if(search)search.addEventListener("input",applyFilter);
+
+  // 重置（需二次确认，避免误清）
+  var rst=document.getElementById("chReset");
+  if(rst){
+    // 文案按当前语言现场生成（按钮初始是 bi() 的 span，不能直接读 textContent）
+    var isEn=function(){return document.documentElement.classList.contains("en");};
+    var TXT={reset:["清空打勾","Reset"],confirm:["再点一次确认清空","Click again to confirm"]};
+    function rstText(key){return TXT[key][isEn()?1:0];}
+    var armed=false,timer=null;
+    rst.addEventListener("click",function(){
+      if(!armed){
+        armed=true;
+        rst.textContent=rstText("confirm");
+        rst.classList.add("armed");
+        clearTimeout(timer);
+        timer=setTimeout(function(){armed=false;rst.textContent=rstText("reset");rst.classList.remove("armed");},4000);
+        return;
+      }
+clearTimeout(timer);armed=false;
+// 清空打勾记录（SiteStore 内部原地清空，state 引用保持有效）
+      SiteStore.resetChronicle();
+      items.forEach(function(it){it.classList.remove("done");it.setAttribute("aria-checked","false");});
+      syncSetHeads();
+      rst.textContent=rstText("reset");rst.classList.remove("armed");
+      refresh();
+    });
+  }
+
+  // 折叠区块：状态存站点统一存储的 ui 里，全站共用一份
+  function initFold(btnId, bodyId, uiKey, hintId){
+    var btn=document.getElementById(btnId);
+    var body=document.getElementById(bodyId);
+    if(!btn||!body)return;
+    var open=SiteStore.ui(uiKey);
+    // 没存过：默认收起（大表格默认不挡内容），给个首访提示
+    if(open===undefined)open=false;
+    function apply(){
+      btn.setAttribute("aria-expanded",open?"true":"false");
+      body.style.display=open?"":"none";
+    }
+    apply();
+    btn.addEventListener("click",function(){
+      open=!open;
+      SiteStore.setUi(uiKey,open);
+      apply();
+    });
+    return {setHint:function(t){var h=document.getElementById(hintId);if(h)h.textContent=t;}};
+  }
+  var runeFold=initFold("runeNeedToggle","runeNeedBody","runeNeedOpen","runeNeedHint");
+
+  // ==========================================================================
+  // 导出 / 导入：把打勾记录带走（换浏览器），或做成图片分享出去
+  //   导出图片 —— canvas 画一张成绩卡，直接发群/朋友圈
+  //   导出 JSON —— 全量完整备份（含时间戳），可再导入
+  //   导入      —— 只吃本站导出的 JSON，写回 SiteStore（localStorage），不上传
+  // 为便于端到端测试，关键纯函数挂在 window.__chronicleIO（无副作用）。
+  // ==========================================================================
+  function L(a,b){return document.documentElement.classList.contains("en")?b:a;}
+
+  // 本页认得的所有条目 id（套装头是批量开关，不是可收集项，排除）
+  var knownIds={};
+  items.forEach(function(it){
+    if(it.getAttribute("data-role")==="set-all")return;
+    knownIds[it.getAttribute("data-id")]=1;
+  });
+
+  function pad2(n){return (n<10?"0":"")+n;}
+  function nowStr(){var d=new Date();return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());}
+
+  // ---- 统计（永远按全量算，不受当前分类 / 搜索影响）----
+  var CAT_ORDER=[["rw",["符文之语","Runewords"]],["set",["套装部件","Set pieces"]],["uni",["独特道具","Unique items"]]];
+  function fullStats(){
+    var cats={},total=0,done=0;
+    CAT_ORDER.forEach(function(p){cats[p[0]]={t:0,d:0};});
+    items.forEach(function(it){
+      if(it.getAttribute("data-role")==="set-all")return;
+      var cat=it.getAttribute("data-cat");
+      if(!cats[cat])cats[cat]={t:0,d:0};
+      cats[cat].t++;total++;
+      if(state[it.getAttribute("data-id")]){cats[cat].d++;done++;}
+    });
+    return {cats:cats,total:total,done:done,pct:total?Math.round(done/total*1000)/10:0};
+  }
+  // 符文预算：还缺几种、共几个（从 data-runes 重算，不读被扣减过的 DOM）
+  function runeSummary(){
+    var tot={},used={};
+    runeRows.forEach(function(tr){
+      var rn=tr.getAttribute("data-rune");
+      tot[rn]=parseInt(tr.querySelector("td.num.tot").textContent,10)||0;
+      used[rn]=0;
+    });
+    items.forEach(function(it){
+      if(it.getAttribute("data-cat")!=="rw")return;
+      if(!state[it.getAttribute("data-id")])return;
+      (it.getAttribute("data-runes")||"").split(",").filter(Boolean).forEach(function(rn){
+        if(rn in used)used[rn]++;
+      });
+    });
+    var lack=0,left=0,all=0;
+    Object.keys(tot).forEach(function(rn){
+      all+=tot[rn];
+      var l=Math.max(0,tot[rn]-used[rn]);
+      if(l>0){lack++;left+=l;}
+    });
+    return {lack:lack,left:left,total:all};
+  }
+
+  // ---- JSON 备份 ----
+  function buildJson(){
+    return JSON.stringify({
+      app:"d2r-chronicle",version:1,
+      site:"https://kingsir.work/D2/chronicle.html",
+      exported:new Date().toISOString(),
+      count:Object.keys(state).length,
+      chronicle:state
+    },null,2);
+  }
+  // 只认本站导出的 JSON：{ chronicle:{...} }，也容忍裸的 { "rw:xx": 时间戳 }
+  function parseJsonImport(text){
+    var s=String(text||"").replace(/^\ufeff/,"").trim();
+    if(s.charAt(0)!=="{")return null;
+    var o;
+    try{o=JSON.parse(s);}catch(e){return null;}
+    if(!o||typeof o!=="object")return null;
+    if(o.chronicle&&typeof o.chronicle==="object")return o.chronicle;
+    var ks=Object.keys(o);
+    if(ks.length&&ks.every(function(k){return /^(rw|uni|piece):/.test(k);}))return o;
+    return null;
+  }
+  // merge：只加不删（换浏览器迁移的正解）；replace：先清空再写入文件里的记录
+  function applyImport(records,mode){
+    var ids=Object.keys(records),applied=0;
+    if(mode==="replace")SiteStore.resetChronicle();
+    ids.forEach(function(id){
+      if(!knownIds[id])return;
+      if(mode!=="replace"&&state[id])return;
+      var v=records[id];
+      // 时间戳要像个真时间（>2000-01-01），否则记为现在
+      state[id]=(typeof v==="number"&&v>946684800000)?v:Date.now();
+      applied++;
+    });
+    save();
+    return applied;
+  }
+
+  // ---- 存文件 ----
+  function saveUrl(url,name){
+    var a=document.createElement("a");
+    a.href=url;a.download=name;a.style.display="none";
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){
+      if(a.parentNode)a.parentNode.removeChild(a);
+      try{URL.revokeObjectURL(url);}catch(e){}
+    },0);
+  }
+  function downloadText(name,text,mime){
+    try{
+      var blob=new Blob([text],{type:(mime||"text/plain")+";charset=utf-8"});
+      saveUrl(URL.createObjectURL(blob),name);
+      return true;
+    }catch(e){return false;}
+  }
+
+  // ---- 分享图片：canvas 画一张成绩卡 ----
+  var CARD={w:1200,h:800,s:2};
+  var FONT='"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+  var COL={bg1:"#241810",bg2:"#0c0a09",panel:"#171009",gold:"#e8c97a",gold2:"#c8a24a",
+           ink:"#efe6d6",muted:"#9a8b73",line:"#3a2f22",track:"#0a0807",
+           good:"#7fbf6a",blood:"#a3302e"};
+  function rr(ctx,x,y,w,h,r){
+    r=Math.min(r,w/2,h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+  // 把卡片画到 ctx 上。ctx 由调用方传入，测试时可传桩对象。
+  function drawShareCard(ctx,st,rs){
+    var W=CARD.w,H=CARD.h,pad=72,i;
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,COL.bg1);g.addColorStop(1,COL.bg2);
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    ctx.lineWidth=2;ctx.strokeStyle=COL.gold2;
+    rr(ctx,24,24,W-48,H-48,22);ctx.stroke();
+
+    // 标题 + 日期
+    ctx.textBaseline="alphabetic";
+    ctx.textAlign="left";ctx.fillStyle=COL.gold;ctx.font="600 46px "+FONT;
+    ctx.fillText(L("收藏编年史","Collection Chronicle"),pad,128);
+    ctx.fillStyle=COL.muted;ctx.font="400 22px "+FONT;
+    ctx.fillText("Diablo II: Resurrected",pad,164);
+    ctx.textAlign="right";ctx.fillStyle=COL.muted;ctx.font="400 22px "+FONT;
+    ctx.fillText(nowStr(),W-pad,128);
+    ctx.fillStyle=COL.line;ctx.fillRect(pad,190,W-pad*2,1);
+
+    // 大数字
+    ctx.textAlign="left";ctx.fillStyle=COL.muted;ctx.font="400 24px "+FONT;
+    ctx.fillText(L("已收集","Collected"),pad,240);
+    ctx.fillStyle=COL.gold;ctx.font="700 84px "+FONT;
+    var big=String(st.done);
+    ctx.fillText(big,pad,322);
+    var bw=ctx.measureText(big).width;
+    ctx.fillStyle=COL.muted;ctx.font="400 32px "+FONT;
+    ctx.fillText("/ "+st.total,pad+bw+16,316);
+    ctx.textAlign="right";ctx.fillStyle=COL.gold;ctx.font="700 56px "+FONT;
+    ctx.fillText(st.pct+"%",W-pad,318);
+
+    // 总进度条
+    var barY=352,barH=16,barW=W-pad*2;
+    ctx.fillStyle=COL.track;ctx.strokeStyle=COL.line;ctx.lineWidth=1;
+    rr(ctx,pad,barY,barW,barH,8);ctx.fill();ctx.stroke();
+    if(st.done>0){
+      var gg=ctx.createLinearGradient(pad,0,pad+barW,0);
+      gg.addColorStop(0,COL.blood);gg.addColorStop(1,COL.gold);
+      ctx.fillStyle=gg;
+      rr(ctx,pad,barY,Math.max(barH,barW*st.done/st.total),barH,8);ctx.fill();
+    }
+
+    // 三个分类
+    var y=420;
+    for(i=0;i<CAT_ORDER.length;i++){
+      var key=CAT_ORDER[i][0],lbl=CAT_ORDER[i][1];
+      var c=st.cats[key]||{t:0,d:0};
+      var pct=c.t?Math.round(c.d/c.t*1000)/10:0;
+      ctx.textAlign="left";ctx.fillStyle=COL.ink;ctx.font="500 26px "+FONT;
+      ctx.fillText(L(lbl[0],lbl[1]),pad,y);
+      ctx.textAlign="right";ctx.fillStyle=COL.muted;ctx.font="400 24px "+FONT;
+      ctx.fillText(c.d+" / "+c.t+"   "+pct+"%",W-pad,y);
+      var by=y+15;
+      ctx.fillStyle=COL.track;
+      rr(ctx,pad,by,barW,10,5);ctx.fill();
+      if(c.d>0){
+        ctx.fillStyle=COL.good;
+        rr(ctx,pad,by,Math.max(10,barW*c.d/c.t),10,5);ctx.fill();
+      }
+      y+=64;
+    }
+
+    // 符文预算摘要
+    var boxY=y+8;
+    ctx.fillStyle=COL.panel;ctx.strokeStyle=COL.line;ctx.lineWidth=1;
+    rr(ctx,pad,boxY,W-pad*2,80,14);ctx.fill();ctx.stroke();
+    ctx.textAlign="left";ctx.fillStyle=COL.ink;ctx.font="500 24px "+FONT;
+    // 全收集齐时不能再说「还缺」，否则「还缺 → 已集齐」自相矛盾
+    ctx.fillText(rs.lack?L("集齐全部符文之语还缺","Still missing to craft every runeword")
+                       :L("符文之语所需符文","Runes needed for every runeword"),pad+24,boxY+30);
+    ctx.fillStyle=COL.gold;ctx.font="700 30px "+FONT;
+    ctx.fillText(rs.lack?(rs.lack+L(" 种 · "," kinds · ")+rs.left+L(" 个"," runes"))
+                       :L("已集齐 · 全部 "+rs.total+" 个","Complete · all "+rs.total+" runes"),
+                 pad+24,boxY+64);
+
+    // 页脚
+    ctx.fillStyle=COL.line;ctx.fillRect(pad,716,W-pad*2,1);
+    ctx.textAlign="left";ctx.fillStyle=COL.gold2;ctx.font="500 22px "+FONT;
+    ctx.fillText("kingsir.work/D2/chronicle.html",pad,754);
+    ctx.textAlign="right";ctx.fillStyle=COL.muted;ctx.font="400 20px "+FONT;
+    ctx.fillText(L("打勾数据仅保存在浏览器本地","Progress is stored locally in your browser"),W-pad,754);
+    return true;
+  }
+  function exportImage(){
+    var cv=document.createElement("canvas");
+    cv.width=CARD.w*CARD.s;cv.height=CARD.h*CARD.s;
+    var ctx=cv.getContext&&cv.getContext("2d");
+    if(!ctx){
+      showBar(L("当前浏览器不支持 canvas，无法生成图片。","This browser cannot render a canvas image."),false);
+      return false;
+    }
+    ctx.scale(CARD.s,CARD.s);
+    drawShareCard(ctx,fullStats(),runeSummary());
+    var name="d2r-chronicle-"+nowStr()+".png";
+    if(cv.toBlob){
+      cv.toBlob(function(blob){
+        if(blob)saveUrl(URL.createObjectURL(blob),name);
+        else saveUrl(cv.toDataURL("image/png"),name);
+      },"image/png");
+    }else{
+      saveUrl(cv.toDataURL("image/png"),name);
+    }
+    return true;
+  }
+
+  // ---- 导入确认条 ----
+  var ioBar=document.getElementById("chIoBar");
+  var ioMsg=document.getElementById("chIoMsg");
+  var ioMerge=document.getElementById("chIoMerge");
+  var ioReplace=document.getElementById("chIoReplace");
+  var ioCancel=document.getElementById("chIoCancel");
+  var pending=null;
+  function hideBar(){if(ioBar)ioBar.hidden=true;pending=null;}
+  function showBar(msg,withActions){
+    if(!ioBar)return;
+    ioMsg.textContent=msg;
+    if(ioMerge)ioMerge.hidden=!withActions;
+    if(ioReplace)ioReplace.hidden=!withActions;
+    if(withActions){
+      if(ioMerge)ioMerge.textContent=L("合并","Merge");
+      if(ioReplace)ioReplace.textContent=L("覆盖","Replace");
+    }
+    if(ioCancel)ioCancel.textContent=L("取消","Cancel");
+    ioBar.hidden=false;
+  }
+  function afterImport(msg){
+    renderAll();refresh();
+    showBar(msg,false);
+  }
+  function handleImportText(text){
+    var rec=parseJsonImport(text);
+    if(!rec){
+      showBar(L("无法识别这个文件：请选择本站「导出 JSON」生成的备份文件。",
+               "Unrecognised file — pick the JSON backup created by Export JSON on this page."),false);
+      return null;
+    }
+    var ids=Object.keys(rec);
+    var known=ids.filter(function(id){return knownIds[id];});
+    var unknown=ids.length-known.length;
+    var have=Object.keys(state).length;
+    if(!known.length){
+      showBar(L("文件里没有本页能识别的收藏记录"+(unknown?"（"+unknown+" 条不认识，已忽略）":"")+"。",
+               "No records here match this page"+(unknown?" ("+unknown+" unknown, ignored)":"")+"."),false);
+      return {known:0,unknown:unknown,records:rec};
+    }
+    pending={records:rec,known:known.length};
+    showBar(L("这个文件有 "+known.length+" 条已收集记录"
+              +(unknown?"（另有 "+unknown+" 条本页不认识，会忽略）":"")
+              +"，你当前已收集 "+have+" 条。",
+              "This file has "+known.length+" collected item(s)"
+              +(unknown?" ("+unknown+" unknown here, ignored)":"")
+              +"; you currently have "+have+"."),true);
+    return {known:known.length,unknown:unknown,records:rec};
+  }
+  if(ioMerge)ioMerge.addEventListener("click",function(){
+    if(!pending)return;
+    var n=applyImport(pending.records,"merge");
+    pending=null;
+    afterImport(L("已合并 "+n+" 条新记录，当前共 "+Object.keys(state).length+" 条。",
+                  "Merged "+n+" new record(s); "+Object.keys(state).length+" collected now."));
+  });
+  if(ioReplace)ioReplace.addEventListener("click",function(){
+    if(!pending)return;
+    var n=applyImport(pending.records,"replace");
+    pending=null;
+    afterImport(L("已按文件覆盖，当前共 "+Object.keys(state).length+" 条。",
+                  "Replaced with the file's records; "+Object.keys(state).length+" collected now."));
+  });
+  if(ioCancel)ioCancel.addEventListener("click",hideBar);
+
+  // ---- 文件选择 ----
+  var fileInput=document.getElementById("chImport");
+  if(fileInput){
+    fileInput.addEventListener("change",function(){
+      var f=fileInput.files&&fileInput.files[0];
+      fileInput.value="";              // 允许连续导入同一个文件
+      if(!f)return;
+      if(typeof FileReader==="undefined"){
+        showBar(L("当前浏览器不支持读取本地文件。","This browser cannot read local files."),false);
+        return;
+      }
+      var rd=new FileReader();
+      rd.onload=function(){handleImportText(rd.result);};
+      rd.onerror=function(){showBar(L("读取文件失败。","Could not read the file."),false);};
+      rd.readAsText(f,"utf-8");
+    });
+  }
+
+  // ---- 导出按钮 ----
+  var shareBtn=document.getElementById("chShare");
+  if(shareBtn)shareBtn.addEventListener("click",exportImage);
+  var exBtn=document.getElementById("chExport");
+  if(exBtn)exBtn.addEventListener("click",function(){
+    downloadText("d2r-chronicle-backup-"+nowStr()+".json",buildJson(),"application/json");
+  });
+
+  // 测试钩子（纯逻辑，不改变页面状态）
+  window.__chronicleIO={
+    buildJson:buildJson,parseJsonImport:parseJsonImport,
+    applyImport:applyImport,handleImportText:handleImportText,
+    fullStats:fullStats,runeSummary:runeSummary,
+    drawShareCard:drawShareCard,exportImage:exportImage,
+    knownIds:knownIds,nowStr:nowStr
+  };
+
+  applyFilter();
 })();
 '''
 
@@ -426,6 +1292,7 @@ def nav_html(depth, active):
     parts = ['<a href="' + p + 'index.html"' + (' class="active"' if active == "home" else "") + '>' + bi("首页", "Home") + '</a>']
     parts.append('<a href="' + p + 'classes/amazon.html"' + (' class="active"' if active.startswith("c:") else "") + '>' + bi("职业", "Classes") + '</a>')
     parts.append('<a href="' + p + 'guides/runewords.html"' + (' class="active"' if active.startswith("g:") else "") + '>' + bi("攻略", "Guides") + '</a>')
+    parts.append('<a href="' + p + 'chronicle.html"' + (' class="active"' if active == "chronicle" else "") + '>' + bi("编年史", "Chronicle") + '</a>')
     return '<nav class="topbar" aria-label="主导航"><div class="wrap"><div class="brand"><span class="dot"></span> ' + bi("暗黑 II 攻略站", "Diablo II Guide") + '</div>' \
            '<button class="menu-toggle" aria-label="菜单">☰</button><div class="navlinks">' + "".join(parts) + '</div></div></nav>'
 
@@ -439,6 +1306,8 @@ def sidebar_html(depth, active):
     for gid, name, en in GUIDE_LIST:
         cls = ' class="active"' if active == "g:" + gid else ""
         out.append('<a href="' + p + 'guides/' + gid + '.html"' + cls + '>' + bi(name, en) + '</a>')
+    out.append('</div><div class="grp"><h4>' + bi("收藏 Collection", "Collection") + '</h4>')
+    out.append('<a href="' + p + 'chronicle.html"' + (' class="active"' if active == "chronicle" else "") + '>' + bi("编年史 Checklist", "Chronicle") + '</a>')
     out.append('</div></aside>')
     return "".join(out)
 
@@ -490,6 +1359,10 @@ GUIDE_KW = {
     "farming": "速刷,MF,Magic Find,85场景,劳模,安姐,卓古拉之握",
 }
 
+CHRONICLE_DESC = ("暗黑破坏神 II：复活（D2R）收藏编年史：99 条符文之语配方、34 套套装共 135 件部件与 388 件独特道具"
+                  "打勾清单，逐条记录你已获得的收藏，分类进度条统计完成度。打勾数据仅保存在浏览器本地（localStorage），不上传服务器。")
+CHRONICLE_KW = "暗黑2,Diablo2收藏清单,D2R符文之语,D2R套装,D2R暗金,编年史,收集进度,localStorage"
+
 def _esc_attr(s):
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
 
@@ -498,6 +1371,8 @@ def _page_rel(active):
         return "classes/" + active[2:] + ".html"
     if active.startswith("g:"):
         return "guides/" + active[2:] + ".html"
+    if active == "chronicle":
+        return "chronicle.html"
     return ""
 
 def seo_meta(depth, active, title, en_t, desc, keywords):
@@ -508,7 +1383,10 @@ def seo_meta(depth, active, title, en_t, desc, keywords):
     pg_name = _esc_attr(title)
     pg_desc = _esc_attr(desc)
     crumbs = [("首页", SITE_URL)]
-    if rel:
+    if rel == "chronicle.html":
+        crumbs.append(("收藏", ""))
+        crumbs.append(("编年史", ""))
+    elif rel:
         if rel.startswith("classes/"):
             cid = rel[len("classes/"):-5]
             nm = next((n for c, n, e in CLASS_LIST if c == cid), "职业")
@@ -1966,13 +2844,285 @@ def g_farming():
            '<div class="pager"><a href="../index.html"><small>' + bi("返回", "Back") + '</small>' + bi("首页", "Home") + '</a><a href="tips.html"><small>' + bi("上一攻略", "Prev Guide") + '</small>' + bi("综合技巧", "Tips") + '</a></div>'
     return _guide_page("速刷与 MF 指南", "g:farming", body)
 
+# ---------------------------------------------------------------------------
+# 收藏编年史：符文之语 / 套装 / 独特道具打勾清单
+# 打勾状态存浏览器 localStorage，纯本地不上传。
+# ---------------------------------------------------------------------------
+def rune_need_table():
+    """符文需求统计：集齐全部符文之语每种符文要几个。
+
+    随上方打勾实时变化 —— JS 用 data-runes 里的符文序列重算剩余量。
+    孔数分栏让玩家能按「先凑 4 孔」这类实际目标拆解。
+    """
+    tiers = [t["sockets"] for t in RUNE_TIERS]
+    ths = "".join('<th data-sk="%d">%s</th>' % (s, bi("%d 孔" % s, "%d-soc" % s)) for s in tiers)
+    rows = []
+    for r in RUNE_NEED:
+        tds = "".join('<td data-sk="%d">%d</td>' % (tiers[i], n)
+                      for i, n in enumerate(r["by_tier"]))
+        rows.append(
+            '<tr data-rune="%s">'
+            '<td><b><code class="rn">#%d %s</code></b></td>'
+            '<td class="num tot">%d</td>'
+            '<td class="num left">%d</td>'
+            '%s'
+            '<td class="col-bar"><span class="ch-bar tiny"><i style="width:%d%%"></i></span></td>'
+            "</tr>"
+            % (r["name"], r["idx"], r["name"], r["total"], r["total"], tds,
+               round(r["total"] / 20.0 * 100))
+        )
+    return (
+        '<div class="card rune-need-card" id="runeNeedCard">'
+        '<button type="button" class="fold-toggle" id="runeNeedToggle" aria-expanded="true" aria-controls="runeNeedBody">'
+        '<span class="fold-arrow" aria-hidden="true"></span>'
+        '<span class="fold-title">' + bi("集齐全部所需符文统计", "Rune budget for every runeword") + '</span>'
+        '<span class="fold-hint" id="runeNeedHint"></span>'
+        '</button>'
+        '<div class="fold-body" id="runeNeedBody">'
+        '<p>' + bi(
+            "这是「把所有符文之语都做一遍」的总账：每种符文需要几个（重复使用同一条里的符文会按出现次数累加，"
+            "比如 Last Wish 要3 个 Jah）。右侧按孔数拆分，可以先定个小目标——"
+            "比如「先把全部 4 孔凑齐」，只买那几档用得上的符文，不被高阶的 Zod 逼着肝。",
+            "This is the full bill for crafting every runeword: how many of each rune you need, counting repeats "
+            "within a single word (Last Wish alone needs three #31 Jah). The columns break it down by socket count, "
+            "so you can aim at a smaller goal first — e.g. complete every 4-socket word and skip the #33 Zod runs "
+            "entirely.") + '</p>'
+        '<div class="tier-sum" id="rwTierSum"></div>'
+        '<div class="table-scroll"><table class="rune-need"><thead><tr>'
+        '<th>' + bi("符文", "Rune") + '</th>'
+        '<th>' + bi("合计", "Total") + '</th>'
+        '<th>' + bi("还缺", "Left") + '</th>'
+        '<th class="tier-head">' + bi("按孔数拆分", "By sockets") + '</th>'
+        '<th></th>'
+        '</tr><tr class="tier-subhead"><th></th><th></th><th></th>' + ths + "<th></th></tr>"
+        '</thead><tbody>' + "".join(rows) + '</tbody></table></div>'
+        '<div class="callout tip"><b>' + bi("提示：", "Tip:") + '</b>'
+        + bi("#33 Zod 只要 3 个、#32 Cham 6 个，压轴的 #31 Jah / #30 Ber 反而要 12 / 9 个 —— "
+             "真正卡进度的是低阶符文（#13 Shael 要 20 个），先把女伯爵刷起来。",
+             "Only three #33 Zod and six #32 Cham are needed, while #31 Jah and #30 Ber want 12 and 9 — "
+             "the real bottleneck is the cheap runes (#13 Shael needs 20). Farm the Countess first.") +
+        '</div></div></div>'
+    )
+
+def _esc(s):
+    return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+def _ch_attr(s):
+    """把文本塞进 HTML 属性前先清掉引号/尖括号，避免破坏结构。
+
+    防回归：属性值必须是不含 '<' 的纯文本。bi() 的输出带 span，
+    塞进属性会破坏 HTML（曾导致 placeholder 里出现 <span ...）。
+    """
+    out = _esc(s).replace('"', "&quot;").strip()
+    if "<" in out or ">" in out:
+        raise ValueError("属性值不能包含标签：%r" % (s,))
+    return out
+
+def _ch_name(zh, en):
+    """条目名：中文为主 + 英文小字。
+
+    两段都用 data-zh-is-name 保护 —— 译名由数据层给定，术语表不应再改写，
+    否则「Enigma」会被再包一层，渲染成「谜团 谜团 Enigma」。
+    """
+    small = ' style="opacity:.55;font-size:.86em;font-weight:400"'
+    if zh == en:
+        return '<span data-zh-is-name="1">%s</span>' % _esc(en)
+    return ('<span data-zh-is-name="1">%s</span> <span%s data-zh-is-name="1">%s</span>'
+            % (_esc(zh), small, _esc(en)))
+
+def _ch_props_html(props, limit=5):
+    if not props:
+        return ""
+    return '<div class="ch-props">%s</div>' % "".join(
+        '<span>%s</span>' % _esc(p) for p in props[:limit])
+
+def _ch_base(en, zh):
+    """底材：中文为主 + 英文小字。"""
+    if not en:
+        return _esc(zh) if zh else ""
+    if not zh or zh == en:
+        return _esc(en)
+    return ('<span data-zh-is-name="1">%s</span> <span style="opacity:.7;font-weight:400">%s</span>'
+            % (_esc(zh), _esc(en)))
+
+def _ch_item(cid, cat, name_html, sub_html, props=None, req=0, search="", runes=None):
+    return ('<div class="ch-item" role="checkbox" tabindex="0" aria-checked="false"'
+            ' data-id="%s" data-cat="%s" data-search="%s" data-sockets="%s" data-runes="%s">'
+            '<span class="ch-box"><span>✓</span></span>'
+            '<div class="ch-main"><div class="ch-name">%s</div>%s%s</div>%s</div>'
+            % (_ch_attr(cid), cat, _ch_attr(search),
+               runes and str(len(runes.split(","))) or "", _ch_attr(runes or ""),
+               name_html, sub_html,
+               _ch_props_html(props or []),
+               ('<span class="ch-req">%s</span>' % bi("需等级 %d" % req, "Lvl %d" % req)) if req else ""))
+
+def _ch_section(sec_id, title_zh, title_en, cat, count, inner):
+    return ('<section class="ch-sec" data-sec="%s">'
+            '<header><h2>%s</h2><span class="cnt" data-catnum="%s">0 / %d</span>'
+            '<span class="ch-bar grow"><i data-catbar="%s" style="width:0%%"></i></span></header>'
+            '%s</section>' % (sec_id, bi(title_zh, title_en), cat, count, cat, inner))
+
+def chronicle():
+    # ---------------- 符文之语 ----------------
+    rw_items = []
+    for r in sorted(RUNEWORDS, key=lambda x: (-x["sockets"], x["en"])):
+        rune_html = '<code class="rw">%s</code>' % " + ".join(r["runes"])
+        ladder = ('<span class="ch-ladder">%s</span>' % bi("天梯专属", "Ladder")) if r["ladder_only"] else ""
+        sub = ('<div class="ch-sub">%s %s · %s %s</div>'
+               % (bi("符文顺序", "Runes"), rune_html, bi("底材", "Base"), _esc(r["base"]))
+               + ("<div>%s</div>" % ladder if ladder else ""))
+        search = " ".join([r["zh"], r["en"], r["base"]] + r["runes"] + r["effects"])
+        rw_items.append(_ch_item(r["id"], "rw", _ch_name(r["zh"], r["en"]), sub,
+                                 r["effects"], req=r.get("req", 0), search=search,
+                                 runes=",".join(r["runes"])))
+
+    # ---------------- 套装 ----------------
+    set_items = []
+    for s in SETS:
+        piece_rows = []
+        for p in s["pieces"]:
+            piece_rows.append(_ch_item(
+                "piece:" + p["en"], "set", _ch_name(p["zh"], p["en"]),
+                '<div class="ch-sub">%s · %s</div>' % (_esc(p["group_zh"]), _ch_base(p["base"], p.get("base_zh", ""))),
+                p["props"], req=p.get("req", 0),
+                search=" ".join([s["zh"], s["en"], p["zh"], p["en"], p["base"], p.get("base_zh", "")])))
+        bits = []
+        if s["bonus2"]:
+            bits.append(bi("2 件：", "2 pc: ") + "、".join(_esc(x) for x in s["bonus2"]))
+        for b in s["bonus"]:
+            bits.append("%d %s：%s" % (b["pieces"], bi("件", "pc"), _esc(b["text"])))
+        bonus = ('<div class="ch-bonus">%s</div>' % "　·　".join(bits)) if bits else ""
+        cnt_zh = "%d 件套" % s["count"]
+        cnt_en = "%d-piece set" % s["count"]
+        # 套装头部可点：一次勾/取消该套装全部部件（data-role=set-all，不计入总进度）
+        head = ('<div class="ch-item ch-set-head" role="checkbox" tabindex="0" aria-checked="false"'
+                ' data-id="__set__%s" data-cat="set" data-role="set-all" data-search="%s">'
+                '<span class="ch-box"><span>✓</span></span>'
+                '<div class="ch-main"><div class="ch-name"><b>%s</b></div>'
+                '<div class="ch-sub">%s</div>%s</div>'
+                '<span class="ch-req">%s</span></div>'
+                % (_ch_attr(s["id"]), _ch_attr(" ".join([s["zh"], s["en"]])),
+                   _ch_name(s["zh"], s["en"]),
+                   bi(cnt_zh, cnt_en),
+                   bonus,
+                   bi("需等级 %d" % s["req"], "Lvl %d" % s["req"]) if s["req"] else ""))
+        set_items.append('<div class="ch-subwrap">' + head
+                         + '<div class="ch-grid ch-pieces">%s</div></div>' % "".join(piece_rows))
+
+    # ---------------- 独特道具（按部位分组） ----------------
+    GROUP_ORDER = [
+        ("helms", "头盔", "Helms"), ("armor", "盔甲", "Body Armor"), ("shields", "盾牌", "Shields"),
+        ("gloves", "手套", "Gloves"), ("boots", "靴子", "Boots"), ("belts", "腰带", "Belts"),
+        ("amulets", "项链", "Amulets"), ("rings", "戒指", "Rings"), ("charms", "护符", "Charms"),
+        ("jewels", "珠宝", "Jewels"), ("orbs", "宝珠", "Orbs"), ("wands", "魔杖", "Wands"),
+        ("staves", "法杖", "Staves"), ("tomes", "典籍", "Tomes"), ("bows", "弓", "Bows"),
+        ("crossbows", "弩", "Crossbows"), ("javelins", "标枪", "Javelins"),
+        ("claws", "爪", "Claws"), ("polearms", "长柄武器", "Polearms"),
+        ("spears", "长矛", "Spears"), ("scepters", "权杖", "Scepters"), ("swords", "剑", "Swords"),
+        ("daggers", "匕首", "Daggers"), ("axes", "斧", "Axes"), ("melee", "钝器", "Blunt Weapons"),
+        ("misc", "其他", "Other"),
+    ]
+    by_group = {}
+    for u in UNIQUES:
+        by_group.setdefault(u["group"], []).append(u)
+    uni_blocks = []
+    for gkey, gzh, gen in GROUP_ORDER:
+        arr = by_group.get(gkey)
+        if not arr:
+            continue
+        rows = []
+        for u in arr:
+            tags = ('<span class="ch-eth">%s</span>' % bi("无形", "Ethereal")) if u["eth"] else ""
+            sub = '<div class="ch-sub">%s%s</div>' % (_ch_base(u["base"], u.get("base_zh", "")), tags)
+            search = " ".join([u["zh"], u["en"], u["base"], u.get("base_zh", ""),
+                               u["group_zh"]] + u["props"])
+            rows.append(_ch_item(u["id"], "uni", _ch_name(u["zh"], u["en"]), sub,
+                                 u["props"], req=u.get("req", 0), search=search))
+        uni_blocks.append('<div class="ch-subwrap"><div class="ch-subgrp">%s · %d</div>'
+                          '<div class="ch-grid">%s</div></div>'
+                          % (bi(gzh, gen), len(arr), "".join(rows)))
+
+    n_rw, n_set, n_uni = len(RUNEWORDS), len(SETS), len(UNIQUES)
+    n_pieces = sum(len(s["pieces"]) for s in SETS)
+    # 可勾选项 = 符文之语 + 套装部件 + 独特道具（套装头是批量开关，不计入）
+    n_total = n_rw + n_pieces + n_uni
+
+    body = (
+      '<div class="breadcrumb"><a href="index.html">' + bi("首页", "Home") + '</a> / '
+      + bi("收藏", "Collection") + ' / ' + bi("编年史", "Chronicle") + '</div>\n'
+      '<div class="ch-hero"><div class="wrap">'
+      '<h1><span class="zt"><span class="zc">收藏编年史 </span><span class="ec" lang="en">Collection Chronicle</span></span></h1>'
+      '<p class="sub">' + bi(
+          "暗黑 II 值得收集的东西就那么些：符文之语、套装、独特道具。这里把它们全列出来，你打勾记录自己收集了多少，"
+          "进度条实时统计完成度。",
+          "There are only so many things worth collecting in Diablo II: runewords, sets and unique items. "
+          "Everything is listed here — tick off what you have and watch the progress bars fill up.") + '</p>'
+      '<div class="ch-total">'
+        '<div><div class="num"><span id="chTotal">0</span> <small id="chTotalOf">/ %d</small></div>'
+        '<div class="meta"><b>%s</b><span id="chPct">0%%</span></div></div>'
+        '<div class="ch-bar"><i id="chBar" style="width:0%%"></i></div>'
+      '</div></div></div>\n'
+      '<div class="ch-toolbar">'
+        # placeholder / aria-label 是纯文本属性，不能用 bi()（会塞 span 破坏 HTML）
+        '<input type="search" id="chSearch" placeholder="搜索中文名 / 英文名 / 属性…" aria-label="搜索收藏条目">'
+        '<button class="ch-tab on" data-filter="all">%s</button>'
+        '<button class="ch-tab" data-filter="rw">%s</button>'
+        '<button class="ch-tab" data-filter="set">%s</button>'
+        '<button class="ch-tab" data-filter="uni">%s</button>'
+        '<button class="ch-reset" id="chReset" data-label="reset" data-confirm="reset-confirm">%s</button>'
+        # 导出图片用于分享；导出 JSON 是可再导入的完整备份；导入用 label 包隐藏的 file input
+        '<span class="ch-io">'
+          '<button type="button" class="ch-btn" id="chShare">%s</button>'
+          '<button type="button" class="ch-btn" id="chExport">%s</button>'
+          '<label class="ch-btn" id="chImportLabel">%s'
+            '<input type="file" id="chImport" accept=".json,application/json" hidden></label>'
+        '</span>'
+      '</div>\n'
+      # 导入前先摆确认条：合并 / 覆盖 / 取消。文案由 JS 按语言现场写。
+      '<div class="ch-io-bar" id="chIoBar" hidden><span class="ch-io-msg" id="chIoMsg"></span>'
+      '<span class="ch-io-acts">'
+        '<button type="button" class="ch-btn primary" id="chIoMerge"></button>'
+        '<button type="button" class="ch-btn" id="chIoReplace"></button>'
+        '<button type="button" class="ch-btn ghost" id="chIoCancel"></button>'
+      '</span></div>\n'
+      '<div class="callout info"><b>%s</b>%s</div>\n'
+      % (n_total,
+         bi("已收集", "Collected"),
+         bi("全部", "All"), bi("符文之语", "Runewords"), bi("套装", "Sets"), bi("独特道具", "Uniques"),
+         bi("清空打勾", "Reset"),
+         bi("导出图片", "Export image"),
+         bi("导出 JSON", "Export JSON"),
+         bi("导入", "Import"),
+         bi("数据只存在你自己的浏览器里：", "Everything stays in your browser: "),
+         bi("打勾状态写在本地 <code>localStorage</code>，不会上传到任何服务器。想分享进度就点「导出图片」生成一张成绩卡；"
+            "换浏览器、换设备之前点「导出 JSON」存一份备份，在新浏览器里「导入」即可恢复打勾记录。",
+            "Ticks are saved to localStorage in this browser only — nothing is uploaded. Use Export image to get a "
+            "shareable progress card; before switching browser or device, hit Export JSON to save a backup, then "
+            "Import it in the new browser to restore your ticks."))
+      + '<div data-chronicle>\n'
+      + _ch_section("rw", "符文之语", "Runewords", "rw", n_rw,
+                    rune_need_table()
+                    + '<div class="ch-grid">%s</div>' % "".join(rw_items))
+      + _ch_section("set", "套装", "Sets", "set", n_pieces, "".join(set_items))
+      + _ch_section("uni", "独特道具", "Unique Items", "uni", n_uni, "".join(uni_blocks))
+      + '</div>\n'
+      '<div class="pager"><a href="index.html"><small>' + bi("返回", "Back") + '</small>'
+      + bi("首页", "Home") + '</a><a href="guides/runewords.html"><small>'
+      + bi("查看图鉴", "See Codex") + '</small>' + bi("符文之语图鉴", "Runewords") + '</a></div>'
+    )
+    # depth=0：chronicle.html 在站点根目录，和 index.html 同级。
+    # 传1 会让 CSS/JS/内链全部指向 ../（跑到站点外层），页面就没样式了。
+    return page("收藏编年史 · 暗黑破坏神 II 攻略站", 0, body, "chronicle", True,
+                desc=CHRONICLE_DESC, en_t="Collection Chronicle | Diablo II: Resurrected Guide",
+                keywords=CHRONICLE_KW)
+
 FAVICON_SVG = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#0c0a09"/><polygon points="32,7 40,25 59,25 44,37 50,57 32,45 14,57 20,37 5,25 24,25" fill="none" stroke="#c8a24a" stroke-width="3"/><circle cx="32" cy="32" r="5.5" fill="#a3302e"/></svg>
 '''
 
 def seo_files():
     """robots.txt 与 sitemap.xml（每个页面单独一条 URL）。"""
     today = datetime.date.today().isoformat()
-    entries = [("", "1.0", "weekly")]
+    entries = [("", "1.0", "weekly"), ("chronicle.html", "0.9", "weekly")]
     for cid, cn, en in CLASS_LIST:
         entries.append(("classes/" + cid + ".html", "0.8", "monthly"))
     for gid, name, en in GUIDE_LIST:
@@ -2016,6 +3166,42 @@ write(os.path.join(OUT, "guides", "terror-zones.html"), g_terror())
 write(os.path.join(OUT, "guides", "uber.html"), g_uber())
 write(os.path.join(OUT, "guides", "tips.html"), g_tips())
 write(os.path.join(OUT, "guides", "farming.html"), g_farming())
+write(os.path.join(OUT, "chronicle.html"), chronicle())
+
+# ---------------------------------------------------------------------------
+# 自检：本地资源引用必须存在、且不能指向站点外层
+# （曾因 chronicle.html 传错 depth 导致 CSS/JS 引用 ../，整页裸奔无样式）
+# ---------------------------------------------------------------------------
+import re as _re
+
+_pages = ["index.html", "chronicle.html"] \
+    + ["classes/%s.html" % c for c, _, _ in CLASS_LIST] \
+    + ["guides/%s.html" % g for g, _, _ in GUIDE_LIST]
+_errs = []
+for _rel in _pages:
+    _p = os.path.join(OUT, _rel)
+    if not os.path.exists(_p):
+        _errs.append("%s 未生成" % _rel)
+        continue
+    _h = open(_p, encoding="utf-8").read()
+    _d = os.path.dirname(_p)
+    for _m in _re.finditer(r'(?:href|src)="([^"]+\.(?:css|js|png|svg|ico))"', _h):
+        _u = _m.group(1)
+        if _u.startswith(("http://", "https://", "//")):
+            continue
+        if not os.path.exists(os.path.normpath(os.path.join(_d, _u))):
+            _errs.append("%s → 资源不存在: %s" % (_rel, _u))
+    # 内部链接（不含锚点/外链）也查一遍
+    for _m in _re.finditer(r'href="([^"#?:]+\.html)"', _h):
+        _u = _m.group(1)
+        if not os.path.exists(os.path.normpath(os.path.join(_d, _u))):
+            _errs.append("%s → 链接不存在: %s" % (_rel, _u))
+if _errs:
+    print("!! 自检发现 %d 个引用问题：" % len(_errs))
+    for _e in _errs[:20]:
+        print("   -", _e)
+    raise SystemExit(1)
 
 print("Site generated.")
+print("Self-check passed: %d pages, all local assets & links resolved." % len(_pages))
 print("Total HTML files:", 1 + 8 + 6)

@@ -517,6 +517,10 @@ footer .repo:hover{color:var(--gold)}
 .ch-item.done .ch-name{text-decoration:line-through;color:var(--muted)}
 .ch-box{flex:0 0 auto;width:19px;height:19px;border:2px solid var(--gold);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--bg);font-weight:700}
 .ch-item.done .ch-box{background:var(--good);border-color:var(--good)}
+/* 打勾后到沉底之间的等待期：给个轻微脉冲，否则 5 秒后突然跳走会莫名其妙 */
+@keyframes chSinkPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,162,74,0)}50%{box-shadow:0 0 0 3px rgba(200,162,74,.16)}}
+.ch-item.pending-down{border-color:var(--gold2);animation:chSinkPulse 1.5s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.ch-item.pending-down{animation:none}}
 .ch-box span{opacity:0;line-height:1}
 .ch-item.done .ch-box span{opacity:1}
 .ch-main{min-width:0;flex:1}
@@ -711,6 +715,7 @@ var SiteStore=(function(){
         if(allOn){delete state[kidId];}else{state[kidId]=Date.now();}
         kid.classList.toggle("done",!allOn);
         kid.setAttribute("aria-checked",allOn?"false":"true");
+        if(allOn){cancelPending(kid);riseToTop(kid);}else{scheduleDown(kid);}
       }
       if(allOn){delete state[id];}else{state[id]=Date.now();}
       el.classList.toggle("done",!allOn);
@@ -721,6 +726,7 @@ var SiteStore=(function(){
     if(state[id]){delete state[id];}else{state[id]=Date.now();}
     el.classList.toggle("done",!!state[id]);
     el.setAttribute("aria-checked",state[id]?"true":"false");
+    if(state[id]){scheduleDown(el);}else{cancelPending(el);riseToTop(el);}
     save();
     syncSetHeads();
     refresh();
@@ -841,7 +847,133 @@ var SiteStore=(function(){
     });
     syncSetHeads();
   }
+
+  // ---- 打勾沉底：未打勾的在上、已打勾的在下 ----
+  // 打勾后不立刻搬走，等 MOVE_DELAY 再沉到本组末尾（给「点错了马上取消」留时间）；
+  // 取消打勾则立即回到未打勾区（最后一条未打勾项之后）。
+  // 只在各自的 .ch-grid 内重排 —— 套装部件不会跑到别的套装去。
+  var MOVE_DELAY=5000;
+  var reduceMotion=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function gridOf(el){
+    var p=el.parentNode;
+    while(p&&p!==root){
+      if(p.classList&&p.classList.contains("ch-grid"))return p;
+      p=p.parentNode;
+    }
+    return null;
+  }
+  // 记住原始次序：重排后就找不回原序了，重置时需要它
+  items.forEach(function(it){
+    if(it.getAttribute("data-role")==="set-all")return;
+    var box=gridOf(it);
+    if(box)it.__ord=Array.prototype.indexOf.call(box.children,it);
+  });
+
+  // 重排 + FLIP 动画（把旧位置到新位置的位移先画出来，再过渡回 0）
+  function reorderAnimated(box,apply){
+    if(!box)return;
+    var kids=Array.prototype.slice.call(box.children);
+    // 先清掉上一轮可能残留的位移，否则量到的旧位置是错的
+    kids.forEach(function(k){if(k.style.transform){k.style.transition="none";k.style.transform="";}});
+    void box.offsetHeight;                       // 强制重排，保证下面量的是真实位置
+    var before=kids.map(function(k){return [k,k.getBoundingClientRect()];});
+    apply();
+    if(reduceMotion)return;
+    var after=Array.prototype.slice.call(box.children);
+    var moved=false;
+    after.forEach(function(k){
+      var rec=null;
+      for(var i=0;i<before.length;i++){if(before[i][0]===k){rec=before[i][1];break;}}
+      if(!rec)return;
+      var a=k.getBoundingClientRect();
+      var dx=rec.left-a.left,dy=rec.top-a.top;
+      if(!dx&&!dy)return;                        // 位置没变 / 元素不可见（rect 全 0）
+      moved=true;
+      k.style.transition="none";
+      k.style.transform="translate("+dx+"px,"+dy+"px)";
+    });
+    if(!moved)return;
+    var step=function(){
+      after.forEach(function(k){
+        if(!k.style.transform)return;
+        k.style.transition="transform .3s cubic-bezier(.2,.7,.3,1)";
+        k.style.transform="translate(0,0)";
+      });
+      setTimeout(function(){
+        after.forEach(function(k){k.style.transition="";k.style.transform="";});
+      },340);
+    };
+    if(typeof requestAnimationFrame==="function")requestAnimationFrame(step);else step();
+  }
+
+  function cancelPending(el){
+    if(el.__moveTimer){clearTimeout(el.__moveTimer);el.__moveTimer=null;}
+    el.classList.remove("pending-down");
+  }
+  function sinkToBottom(el){
+    var box=gridOf(el);
+    if(!box||box.lastElementChild===el)return;
+    reorderAnimated(box,function(){box.appendChild(el);});
+  }
+  function riseToTop(el){
+    var box=gridOf(el);
+    if(!box)return;
+    var kids=Array.prototype.slice.call(box.children);
+    var pos=kids.indexOf(el);
+    var firstDone=-1;                            // 第一个「别的」已打勾项
+    for(var i=0;i<kids.length;i++){
+      if(kids[i]!==el&&kids[i].classList.contains("done")){firstDone=i;break;}
+    }
+    // 已经待在未打勾区里（在第一个已打勾项之前）就原地不动 ——
+    // 否则「点一下又取消」会把它莫名推到末尾。
+    if(firstDone<0||pos<firstDone)return;
+    var anchor=null;                             // 插到最后一个未打勾的姊妹后面
+    for(var j=0;j<firstDone;j++){if(kids[j]!==el)anchor=kids[j];}
+    reorderAnimated(box,function(){
+      if(anchor)box.insertBefore(el,anchor.nextElementSibling);
+      else box.insertBefore(el,box.firstElementChild);
+    });
+  }
+  function scheduleDown(el){
+    cancelPending(el);
+    if(!gridOf(el))return;
+    el.classList.add("pending-down");
+    el.__moveTimer=setTimeout(function(){
+      el.__moveTimer=null;
+      el.classList.remove("pending-down");
+      if(el.classList.contains("done"))sinkToBottom(el);   // 期间被取消过就不动
+    },MOVE_DELAY);
+  }
+  // 按「未打勾在前、已打勾在后」整组重排（分组内部相对次序不变）
+  function applyOrder(){
+    var boxes=[];
+    items.forEach(function(it){
+      var b=gridOf(it);
+      if(b&&boxes.indexOf(b)<0)boxes.push(b);
+    });
+    boxes.forEach(function(box){
+      var undone=[],done=[];
+      Array.prototype.slice.call(box.children).forEach(function(k){
+        (k.classList.contains("done")?done:undone).push(k);
+      });
+      undone.concat(done).forEach(function(k){box.appendChild(k);});
+    });
+  }
+  // 还原到初始次序（清空打勾后用）
+  function restoreOrder(){
+    var boxes=[];
+    items.forEach(function(it){
+      var b=gridOf(it);
+      if(b&&boxes.indexOf(b)<0)boxes.push(b);
+    });
+    boxes.forEach(function(box){
+      Array.prototype.slice.call(box.children)
+        .sort(function(a,b){return (a.__ord||0)-(b.__ord||0);})
+        .forEach(function(k){box.appendChild(k);});
+    });
+  }
   renderAll();
+  applyOrder();     // 载入时就把已打勾的排到各组下方，保持与打勾行为一致
 
   // 分类切换
   var tabs=Array.prototype.slice.call(document.querySelectorAll(".ch-tab"));
@@ -898,8 +1030,13 @@ var SiteStore=(function(){
 clearTimeout(timer);armed=false;
 // 清空打勾记录（SiteStore 内部原地清空，state 引用保持有效）
       SiteStore.resetChronicle();
-      items.forEach(function(it){it.classList.remove("done");it.setAttribute("aria-checked","false");});
+      items.forEach(function(it){
+        cancelPending(it);
+        it.classList.remove("done");
+        it.setAttribute("aria-checked","false");
+      });
       syncSetHeads();
+      restoreOrder();          // 全部归零后还原成初始次序
       rst.textContent=rstText("reset");rst.classList.remove("armed");
       refresh();
     });
@@ -1182,7 +1319,9 @@ clearTimeout(timer);armed=false;
     ioBar.hidden=false;
   }
   function afterImport(msg){
-    renderAll();refresh();
+    renderAll();
+    applyOrder();            // 导入后也把已打勾的排到下方
+    refresh();
     showBar(msg,false);
   }
   function handleImportText(text){
@@ -1258,7 +1397,12 @@ clearTimeout(timer);armed=false;
     applyImport:applyImport,handleImportText:handleImportText,
     fullStats:fullStats,runeSummary:runeSummary,
     drawShareCard:drawShareCard,exportImage:exportImage,
-    knownIds:knownIds,nowStr:nowStr
+    knownIds:knownIds,nowStr:nowStr,
+    // 打勾沉底
+    sinkToBottom:sinkToBottom,riseToTop:riseToTop,scheduleDown:scheduleDown,
+    applyOrder:applyOrder,restoreOrder:restoreOrder,gridOf:gridOf,
+    moveDelay:function(){return MOVE_DELAY;},
+    setMoveDelay:function(ms){MOVE_DELAY=ms;}
   };
 
   applyFilter();

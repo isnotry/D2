@@ -26,7 +26,7 @@ ZH_PAIRS = [
     ("Hammerdin", "祝福之锤圣骑士"), ("Zealot", "热诚圣骑士"),
     ("FoH / Smiter", "天堂之拳/盾击圣骑士"), ("Whirlwind Barbarian", "旋风野蛮人"),
     ("Pitzerker", "寻物狂战"), ("Singer", "战吼野蛮人"), ("Wind Druid", "风德"), ("Fire Druid", "火德"),
-    ("Werewolf Fury", "狼人狂怒"), ("Trapsin", "陷阱刺客"), ("Mosaic 武学刺客", "马赛克武学刺客"),
+    ("Werewolf Fury", "狼人狂怒"), ("Trapsin", "陷阱刺客"), ("Mosaic 武学刺客", "模糊武学刺客"),
     # 亚马逊技能
     ("Lightning Fury", "闪电之怒"), ("Charged Strike", "充能一击"), ("Lightning Strike", "闪电打击"),
     ("Power Strike", "强力打击"), ("Poison Javelin", "毒枪"), ("Plague Javelin", "瘟疫标枪"),
@@ -36,15 +36,15 @@ ZH_PAIRS = [
     ("Penetration", "穿透"), ("Valkyrie", "瓦尔基里"), ("Decoy", "诱饵"), ("Slow Missiles", "慢速箭"),
     # 法师技能
     ("Frozen Orb", "冰封球"), ("Blizzard", "暴风雪"), ("Ice Blast", "冰风暴"), ("Glacial Spike", "冰尖柱"),
-    ("Frozen Armor", "碎冰甲"), ("Cold Mastery", "冰冷支配"), ("Lightning", "闪电"), ("Chain Lightning", "闪电链"),
-    ("Nova", "新星"), ("Static Field", "静态力场"), ("Lightning Mastery", "闪电支配"),
+    ("Frozen Armor", "碎冰甲"), ("Cold Mastery", "冰冷支配"), ("Lightning", "闪电"), ("Chain Lightning", "连锁闪电"),
+    ("Nova", "新星"), ("Static Field", "静电场"), ("Lightning Mastery", "闪电支配"),
     ("Telekinesis", "心灵传动"), ("Teleport", "传送"), ("Fire Ball", "火球"), ("Meteor", "陨石"),
-    ("Hydra", "九头蛇"), ("Enchant", "附魔"), ("Warmth", "温暖"), ("Fire Mastery", "火焰支配"),
+    ("Hydra", "九头海蛇"), ("Enchant", "附魔"), ("Warmth", "温暖"), ("Fire Mastery", "火焰支配"),
     ("Fire Bolt", "火弹"), ("Ice Bolt", "冰弹"), ("Frost Nova", "霜之新星"),
     # 亡灵法师技能
-    ("Raise Skeleton", "复活骷髅"), ("Skeleton Mastery", "骷髅掌握"), ("Clay Golem", "黏土石魔"),
+    ("Raise Skeleton", "骷髅复生"), ("Skeleton Mastery", "骷髅掌握"), ("Clay Golem", "黏土石魔"),
     ("Iron Golem", "钢铁石魔"), ("Revive", "重生"), ("Summon Resist", "召唤抵抗"),
-    ("Poison Dagger", "毒牙"), ("Poison Nova", "剧毒新星"), ("Bone Spear", "骨矛"), ("Bone Spirit", "骨魂"),
+    ("Poison Dagger", "毒匕首"), ("Poison Nova", "剧毒新星"), ("Bone Spear", "骨矛"), ("Bone Spirit", "骨魂"),
     ("Bone Prison", "骨牢"), ("Bone Wall", "骨墙"), ("Corpse Explosion", "尸体爆炸"), ("Teeth", "牙"),
     ("Amplify Damage", "伤害加深"), ("Decrepify", "衰老"), ("Dim Vision", "微暗灵视"),
     ("Lower Resist", "降低抵抗"), ("Iron Maiden", "钢铁处女"), ("Life Tap", "偷取生命"),
@@ -52,7 +52,7 @@ ZH_PAIRS = [
     # 圣骑士技能
     ("Sacrifice", "牺牲"), ("Zeal", "热诚"), ("Smite", "盾击"), ("Charge", "冲锋"),
     ("Holy Shield", "神圣之盾"), ("Vengeance", "复仇"), ("Conversion", "转换"), ("Might", "力量"),
-    ("Holy Fire", "神圣火焰"), ("Holy Frost", "神圣冰冻"), ("Holy Shock", "神圣冲击"),
+    ("Holy Fire", "神圣火焰"), ("Holy Freeze", "神圣冰冻"), ("Holy Shock", "神圣冲击"),
     ("Fanaticism", "狂热"), ("Conviction", "信念"), ("Sanctuary", "庇护所"), ("Blessed Aim", "祝福瞄准"),
     ("Prayer", "祈祷"), ("Cleansing", "净化"), ("Meditation", "冥思"), ("Concentration", "专注"),
     ("Blessed Hammer", "祝福之锤"), ("Vigor", "活力"), ("Fist of the Heavens", "天堂之拳"),
@@ -79,48 +79,50 @@ ZH_PAIRS = [
     ("Cobra Strike", "眼镜蛇击"), ("Dragon Talon", "龙爪"), ("Dragon Claw", "龙拳"),
     ("Dragon Tail", "龙尾"), ("Dragon Flight", "龙跃"), ("Burst of Speed", "速度爆发"),
     ("Fade", "消退"), ("Cloak of Shadows", "魔影斗篷"), ("Mind Blast", "心灵爆震"),
-    ("Venom", "毒素"), ("Weapon Block", "武器格挡"), ("Shadow Master", "影子大师"),
+    ("Venom", "毒牙"), ("Weapon Block", "武器格挡"), ("Shadow Master", "影子大师"),
     ("Shadow Warrior", "影子战士"),
     # 补充技能（国服译名）
     ("Conversion", "转换"), ("Leap", "跳跃"), ("Leap Attack", "跳跃攻击"),
     ("Dragon Claw", "龙拳"), ("Dragon Tail", "龙尾"), ("Dragon Flight", "龙跃"),
     ("Twister", "旋风"),
     # 符文之语
-    ("Mosaic", "马赛克"), ("Flickering Flame", "摇曳火焰"), ("Mist", "薄雾"), ("Obsession", "痴迷"),
-    ("Plague", "瘟疫"), ("Pattern", "韵律"), ("Unbending Will", "不屈意志"), ("Wisdom", "智慧"),
-    ("Bulwark", "壁垒"), ("Cure", "治愈"), ("Ground", "大地"), ("Hearth", "壁炉"),
-    ("Temper", "锻造"), ("Hustle", "匆忙"), ("Metamorphosis", "蜕变"), ("Enigma", "谜团"),
+    ("Mosaic", "模糊"), ("Flickering Flame", "闪烁火焰"), ("Mist", "迷雾"), ("Obsession", "执着"),
+    ("Plague", "瘟疫"), ("Pattern", "典范"), ("Unbending Will", "不屈之志"), ("Wisdom", "智慧"),
+    ("Bulwark", "壁垒"), ("Cure", "解药"), ("Ground", "接地"), ("Hearth", "壁炉"),
+    ("Temper", "淬火"), ("Hustle", "喧嚣"), ("Metamorphosis", "变形"), ("Enigma", "谜团"),
     ("Infinity", "无限"), ("Spirit", "精神"), ("Heart of the Oak", "橡树之心"), ("Fortitude", "刚毅"),
-    ("Call to Arms", "战争召唤"), ("Grief", "悲伤"), ("Chains of Honor", "荣耀之链"),
-    ("Death's Web", "死亡之网"), ("Stealth", "潜行"), ("Ancient's Pledge", "远古誓约"),
-    ("Lore", "学识"), ("Smoke", "烟雾"), ("Treachery", "背叛"), ("Spirit Monarch", "精神君主盾"),
+    ("Call to Arms", "战争召唤"), ("Grief", "悔恨"), ("Chains of Honor", "荣耀之链"),
+    ("Breath of the Dying", "死亡呼吸"), ("Death's Web", "死亡之网"), ("Eternity", "永恒"),
+    ("Rhyme", "声韵"), ("Stealth", "隐密"), ("Ancient's Pledge", "先祖之誓"),
+    ("Lore", "知识"), ("Smoke", "烟雾"), ("Treachery", "背信"), ("Spirit Monarch", "精神君主盾"),
+    ("Authority", "权威"), ("Coven", "女巫团"), ("Vigilance", "警戒"), ("Ritual", "仪式"),
     # 暗金/装备
-    ("Titan's Revenge", "泰坦标枪"), ("Griffon's Eye", "格里芬之眼"), ("Mara's Kaleidoscope", "马拉"),
-    ("Razortail", "剃刀尾"), ("SoJ", "乔丹之石"), ("Shako", "军帽"), ("Nightwing's Veil", "夜翼面纱"),
+    ("Titan's Revenge", "泰坦的复仇"), ("Griffon's Eye", "狮鹫之眼"), ("Mara's Kaleidoscope", "马拉的万花筒"),
+    ("Razortail", "剃刀之尾"), ("SoJ", "乔丹之石"), ("Shako", "谐角之冠"), ("Nightwing's Veil", "夜翼面纱"),
     ("Tal Rasha's", "塔拉夏"), ("Arachnid Mesh", "蜘蛛之网"), ("Magefist", "法师之拳"),
-    ("Homunculus", "侏儒"), ("Peasant Crown", "农民皇冠"), ("Beast", "野兽"),
-    ("Skin of Vipermagi", "蛇魔之皮"), ("Herald of Zakarum", "撒卡兰姆使者"),
-    ("Guillaume's", "纪尧姆之颅"), ("String of Ears", "耳串"), ("Dracul's Grasp", "卓古拉之握"),
-    ("Gore Rider", "蚀肉骑士"), ("Arreat's Face", "亚瑞特之脸"), ("Highlord's Wrath", "大君之怒"),
-    ("Stormshield", "暴风之盾"), ("Ali Baba", "阿里巴巴"), ("Gull", "海鸥"), ("Goldwrap", "金色包袱"),
-    ("Chance Guards", "运气守护"), ("War Traveler", "战争旅者"), ("Nagelring", "拿各之戒"),
-    ("Jalal's Mane", "加洛之鬃"), ("Bartuc's", "巴图克"), ("Shadow Dancer", "暗影舞者"),
-    ("Phoenix", "凤凰"), ("Skullder's", "斯凯林之愤怒"), ("Stealskull", "偷颅"),
-    ("Andariel's Visage", "安达利尔的面容"), ("Windforce", "风之力"), ("Faith", "信心"),
-    ("Crown of Ages", "年纪"), ("Trang-Oul's", "特朗奥"), ("Stone of Jordan", "乔丹之石"),
+    ("Homunculus", "魔胎"), ("Peasant Crown", "农夫王冠"), ("Beast", "野兽"),
+    ("Skin of Vipermagi", "蛇魔法师之皮"), ("Herald of Zakarum", "撒卡兰姆使者"),
+    ("Guillaume's", "吉永之脸"), ("String of Ears", "长串之耳"), ("Dracul's Grasp", "德古拉之握"),
+    ("Gore Rider", "蚀肉骑士"), ("Arreat's Face", "亚瑞特的面容"), ("Highlord's Wrath", "大君之怒"),
+    ("Stormshield", "暴风之盾"), ("Ali Baba", "阿里巴巴"), ("Gull", "海鸥"), ("Goldwrap", "黄金裹腰"),
+    ("Chance Guards", "运气守护"), ("War Traveler", "战争旅者"), ("Nagelring", "拿各的戒指"),
+    ("Jalal's Mane", "加尔的鬃毛"), ("Bartuc's", "霸图克"), ("Shadow Dancer", "影舞者"),
+    ("Phoenix", "凤凰"), ("Skullder's", "斯寇德的愤怒"), ("Stealskull", "盗窃颅盔"),
+    ("Andariel's Visage", "安达莉尔的面貌"), ("Windforce", "风之力"), ("Faith", "信心"),
+    ("Crown of Ages", "岁月之冠"), ("Trang-Oul's", "塔格奥"), ("Stone of Jordan", "乔丹之石"),
     # 地点/专有
     ("Terror Zones", "恐怖地带"), ("Ladder", "天梯"), ("Sunder Charm", "破免护符"),
     ("Sunder Charms", "破免护符"), ("Cold Sunder Charm", "冰破免护符"),
     ("Lightning Sunder Charm", "电破免护符"), ("Fire Sunder Charm", "火破免护符"),
     ("Poison Sunder Charm", "毒破免护符"), ("Physical Sunder", "物破免"), ("Magic Sunder", "魔破免"),
-    ("The Pit", "彼特"), ("Chaos Sanctuary", "混沌避难所"), ("Ancient Tunnels", "远古通道"),
+    ("The Pit", "地穴"), ("Chaos Sanctuary", "混沌避难所"), ("Ancient Tunnels", "古代水道"),
     ("Cows", "牛场"), ("Countess", "女伯爵"), ("Tristram", "崔斯特姆"), ("Mephisto", "墨菲斯托"),
-    ("Diablo", "迪亚波罗"), ("Baal", "巴尔"), ("Andariel", "安达利尔"), ("Duriel", "都瑞尔"),
-    ("Nihlathak", "尼拉塞克"), ("Uber", "超级"), ("Worldstone Chamber", "世界之石大殿"),
+    ("Diablo", "迪亚波罗"), ("Baal", "巴尔"), ("Andariel", "安达莉尔"), ("Duriel", "都瑞尔"),
+    ("Nihlathak", "尼拉塞克"), ("Worldstone Chamber", "世界之石大殿"),
     ("Blood Moor", "血腥荒地"), ("Arcane Sanctuary", "神秘避难所"), ("Maggot Lair", "蛆虫巢穴"),
     ("Tombs", "墓穴"), ("Stony Field", "石头旷野"), ("Underground Passage", "地下通道"),
-    ("Blood Raven", "血鸦"), ("Smith", "铁匠"), ("Hellfire Torch", "地狱火火炬"),
-    ("Annihilus", "毁灭"), ("Token of Absolution", "赦罪令牌"),     ("Diablo Clone", "迪亚波罗克隆"),
+    ("Blood Raven", "血鸟"), ("Smith", "铁匠"), ("Hellfire Torch", "地狱火炬"),
+    ("Annihilus", "灭绝"), ("Token of Absolution", "赦免徽章"), ("Diablo Clone", "迪亚波罗克隆"),
     # 术士（2026「术士君临」新职业）技能/专有
     ("Chaos", "混沌"), ("Demon", "恶魔"), ("Eldritch", "邪术"),
     ("Goatmen", "羊头人"), ("Tainted", "污堕者"), ("Defiler", "污秽者"),
@@ -135,8 +137,8 @@ ZH_PAIRS = [
     ("Entropy Mastery", "熵之精通"), ("Throw Weapon", "投掷武器"), ("Offhand", "副手"),
     ("Bind Single Demon", "绑定单体恶魔"), ("Defiler Bind Single Demon", "污秽者绑定单体恶魔"),
     ("Consume", "吞噬"), ("Goatmen Summon", "羊头人召唤"), ("Tainted Summon", "污堕者召唤"),
-    ("Sword/Mace/Axe/ Polearm Mastery", "剑/锤/斧/长柄精通"), ("Polearm Mastery", "长柄精通"),
-    ("Sword", "剑"), ("Mace", "锤"), ("Axe", "斧"),
+    ("Sword/Mace/Axe/ Polearm Mastery", "剑/钉锤/斧/长柄精通"), ("Polearm Mastery", "长柄精通"),
+    ("Sword", "剑"), ("Mace", "钉锤"), ("Axe", "斧"),
     ("Loot Filter", "战利品筛选"), ("Hellfire", "地狱火"), ("Void", "虚空"),
     ("The Flame Rift", "烈焰裂隙"), ("The Cold Rupture", "寒冰裂断"),
     ("The Crack of the Heavens", "天穹裂隙"), ("The Bone Break", "碎骨之地"),
@@ -148,24 +150,27 @@ ZH_PAIRS = [
     ("Sigil: Death", "死亡印记"), ("Bind Demon", "束缚恶魔"), ("Miasma Chain", "瘴气锁链"),
     ("Ladder Season 15", "天梯第 15 赛季"), ("Patch 3.3", "3.3 补丁"),
     # Patch 3.3 重做/加强的练级暗金与套装
-    ("Angelic Raiment", "天使之袍"), ("Angelic Sickle", "天使之镰"), ("Angelic Mantle", "天使披风"),
-    ("Bloodletter", "放血者"), ("The Battlebranch", "战枝"), ("Blinkbat's Form", "闪蝠之形"),
-    ("Manald Heal", "玛那德之愈"), ("Rogue's Bow", "罗格之弓"), ("Bane Ash", "灰烬灾星"),
-    ("Gravenspine", "孤坟之脊"), ("Pluckeye", "啄目弓"), ("The Ward", "守望之盾"),
+    ("Angelic Raiment", "天使的衣装"), ("Angelic Sickle", "天使的镰刀"), ("Angelic Mantle", "天使的披风"),
+    ("Bloodletter", "放血者"), ("The Battlebranch", "战斗枝桠"), ("Blinkbat's Form", "闪蝠之躯"),
+    ("Manald Heal", "玛那德的治疗"), ("Rogue's Bow", "侠盗之弓"), ("Bane Ash", "祸根之灰"),
+    ("Gravenspine", "墓穴之脊"), ("Pluckeye", "夺人目"), ("The Ward", "庇护结界"),
     # 通用机制 / 破免 / 缩写
     ("Sunder", "破免"), ("Sunder Charms", "破免护符"), ("Cold Sunder", "破冰免"), ("Lightning Sunder", "破电免"),
     ("Fire Sunder", "破火免"), ("Magic Sunder", "破魔免"), ("Poison Sunder", "破毒免"),
-    ("Magic Find", "魔法寻获"), ("Hardcore", "专家模式"), ("Uber Smiter", "超级盾击丁"),
-    ("Ubers", "超级场景"), ("Boss", "首领"), ("Resurrected", "重制版"),
+    ("Magic Find", "魔法寻获"), ("Hardcore", "专家模式"),
+    ("Boss", "首领"), ("Resurrected", "重制版"),
     # 通用名词（源里纯英文）
     ("Summon", "召唤"), ("Summoner", "召唤师"), ("Energy Shield", "能量护盾"),
     ("Attract", "吸引"), ("Craft", "制作"), ("Passive", "被动"), ("Crossbow", "弩"),
     ("Farming", "速刷"), ("Leveling", "升级"), ("Runewords", "符文之语"), ("Runeword", "符文之语"),
-    ("Tips", "技巧"), ("Merc", "佣兵"), ("Insight", "洞察"), ("Grand Charm", "大型护符"),
+    ("Tips", "技巧"), ("Merc", "佣兵"), ("Insight", "眼光"), ("Grand Charm", "大型护符"),
     # 地点 / 装备（个别未译）
-    ("Raven Frost", "霜之乌鸦"), ("Titans", "泰坦标枪"), ("Honor", "荣耀"),
-    ("Tamoe Highland", "塔莫高地"), ("Lost City", "失落城市"), ("Pindle", "平德尔"),
-    ("Cain", "凯恩"), ("The Cold Plains", "寒冷平原"), ("Pits", "深坑"),
+    ("Raven Frost", "乌鸦之霜"), ("Titans", "泰坦的复仇"), ("Honor", "荣耀"),
+    ("Tamoe Highland", "塔莫高地"), ("Lost City", "失落之城"), ("Pindle", "暴躁外皮"),
+    ("Cain", "凯恩"), ("The Cold Plains", "寒冷平原"), ("Pits", "地穴"),
+    ("Harlequin Crest", "谐角之冠"), ("Skullder's Ire", "斯寇德的愤怒"),
+    ("Trang-Oul's Avatar", "塔格奥的化身"), ("Bartuc's Cut-Throat", "霸图克的割喉爪"),
+    ("Guillaume's Face", "吉永之脸"), ("Tal Rasha's Wrappings", "塔拉夏的外袍"),
     # 技能树标题（默认中文显示，英文切换可见；Lightning/Demon/Eldritch/Chaos 已在上方）
     ("Javelin & Spear", "标枪与长矛"), ("Bow & Crossbow", "弓与弩"),
     ("Passive & Magic", "被动与魔法"), ("Cold", "冰冷"), ("Fire", "火焰"),
@@ -1425,7 +1430,7 @@ CLASS_LIST = [
 GUIDE_LIST = [
     ("runewords", "符文之语图鉴", "Runewords"),
     ("leveling", "练级与开荒", "Leveling & Early Game"),
-    ("terror-zones", "恐怖地带 & Sunder", "Terror Zones & Sunder"),
+    ("terror-zones", "恐怖地带与破免", "Terror Zones & Sunder"),
     ("uber", "Uber 终局", "Uber Endgame"),
     ("tips", "综合技巧", "General Tips"),
     ("farming", "速刷与 MF 指南", "Farming & MF Guide"),
@@ -1442,16 +1447,16 @@ def nav_html(depth, active):
 
 def sidebar_html(depth, active):
     p = "../" if depth else ""
-    out = ['<aside class="sidebar" aria-label="站点导航"><div class="grp"><h4>' + bi("职业 Classes", "Classes") + '</h4>']
+    out = ['<aside class="sidebar" aria-label="站点导航"><div class="grp"><h4>' + bi("职业", "Classes") + '</h4>']
     for cid, cn, en in CLASS_LIST:
         cls = ' class="active"' if active == "c:" + cid else ""
         out.append('<a href="' + p + 'classes/' + cid + '.html"' + cls + '>' + bi(cn, en) + '</a>')
-    out.append('</div><div class="grp"><h4>' + bi("攻略 Guides", "Guides") + '</h4>')
+    out.append('</div><div class="grp"><h4>' + bi("攻略", "Guides") + '</h4>')
     for gid, name, en in GUIDE_LIST:
         cls = ' class="active"' if active == "g:" + gid else ""
         out.append('<a href="' + p + 'guides/' + gid + '.html"' + cls + '>' + bi(name, en) + '</a>')
-    out.append('</div><div class="grp"><h4>' + bi("收藏 Collection", "Collection") + '</h4>')
-    out.append('<a href="' + p + 'chronicle.html"' + (' class="active"' if active == "chronicle" else "") + '>' + bi("编年史 Checklist", "Chronicle") + '</a>')
+    out.append('</div><div class="grp"><h4>' + bi("收藏", "Collection") + '</h4>')
+    out.append('<a href="' + p + 'chronicle.html"' + (' class="active"' if active == "chronicle" else "") + '>' + bi("编年史", "Chronicle") + '</a>')
     out.append('</div></aside>')
     return "".join(out)
 
@@ -1462,7 +1467,7 @@ SITE_DESC = "Diablo II: Resurrected 全职业加点与流派攻略的中英双�
 OG_IMAGE = SITE_URL + "docs/og-image.png"
 OG_IMAGE_ALT = "暗黑破坏神 II：复活攻略站 · 职业总览与攻略入口"
 
-HOME_DESC = "暗黑破坏神 II：复活（D2R）全职业攻略站：八大职业技能树加点、主流流派 Build、装备思路与开荒/终局技巧，附符文之语图鉴、恐怖地带、Uber 终局与速刷 MF 指南。已同步 Patch 3.3 / 天梯第 15 赛季，中英双语、纯静态零依赖。"
+HOME_DESC = "暗黑破坏神 II：复活（D2R）全职业攻略站：八大职业技能树加点、主流流派 Build、装备思路与开荒/终局技巧，附符文之语图鉴、恐怖地带、Uber 终局与速刷 MF 指南。已同步 Patch 3.4 / 天梯第 16 赛季，中英双语、纯静态零依赖。"
 HOME_KW = "暗黑破坏神2,暗黑2重制版,Diablo II Resurrected,D2R,职业加点,流派Build,符文之语,恐怖地带"
 
 CLASS_DESC = {
@@ -1471,9 +1476,9 @@ CLASS_DESC = {
     "necromancer": "亡灵法师（Necromancer）暗黑2重制版攻略：召唤流、毒亡灵法师与骨系的技能加点、尸体爆炸清场、破免与 MF 配置，单人通关最省心职业，适配 Patch 3.3。",
     "paladin": "圣骑士（Paladin）暗黑2重制版攻略：祝福之锤 Hammerdin、热诚 Zealot 与天堂之拳/盾击的技能加点、FCR 与抗性档位、廉价开荒配装，新手首选职业，适配 Patch 3.3。",
     "barbarian": "野蛮人（Barbarian）暗黑2重制版攻略：旋风 Whirlwind、狂乱 Frenzy、寻物 Pitzerker 与战吼 Singing 的技能加点、武器选择、AR 与 MF 平衡思路，适配 Patch 3.3。",
-    "druid": "德鲁伊（Druid）暗黑2重制版攻略：风德、火德与狼人狂怒变身的技能加点、破免前的ç ´免思路、武器攻速档位与佣兵搭配，适配 Patch 3.3。",
+    "druid": "德鲁伊（Druid）暗黑2重制版攻略：风德、火德与狼人狂怒变身的技能加点、破免前的减抗思路、武器攻速档位与佣兵搭配，适配 Patch 3.3。",
     "warlock": "术士（Warlock）暗黑2重制版攻略：2026 资料片第八职业 Chaos / Eldritch / Demon 三系技能树、Sigil: Death 主推流派、束缚恶魔辅助定位与 Patch 3.3 修正说明。",
-    "assassin": "刺客（Assassin）暗黑2重制版攻略：陷阱 Trapsin、马赛克 Mosaic 武学与飞刀的技能加点、IAS 档位、无限 Anya 项链等核心装备与破免配法，适配 Patch 3.3。",
+    "assassin": "刺客（Assassin）暗黑2重制版攻略：陷阱 Trapsin、模糊 Mosaic 武学与飞刀的技能加点、IAS 档位、无限 Anya 项链等核心装备与破免配法，适配 Patch 3.3。",
 }
 CLASS_KW = {
     "amazon": "亚马逊,Amazon,Javazon,标枪亚马逊,加点,流派",
@@ -1483,24 +1488,24 @@ CLASS_KW = {
     "barbarian": "野蛮人,Barbarian,旋风,Whirlwind,寻物,战吼,加点",
     "druid": "德鲁伊,Druid,风德,狼人变化,加点",
     "warlock": "术士,Warlock,Sigil Death,新职业,2026资料片,加点",
-    "assassin": "刺客,Assassin,陷阱,Mosaic,马赛克,武学,加点",
+    "assassin": "刺客,Assassin,陷阱,Mosaic,模糊,武学,加点",
 }
 
 GUIDE_DESC = {
-    "runewords": "符文之语图鉴：常用符文之语配方、符文序号、底材与孔数需求、适用职业与定位速查，含天梯专属轮换到非天梯的说明，一张表格看全部。",
+    "runewords": "符文之语图鉴：常用符文之语配方、符文序号、底材与孔数需求、适用职业与定位速查，含 3.0「术士君临」新增与 3.4 调整说明，一张表格看全部。",
     "leveling": "练级与开荒指南：1-85 级路线规划、效率练级点、Patch 3.3 加强后的练级暗金推荐与开荒职业起步流程。",
     "terror-zones": "恐怖地带与破免护符攻略：恐怖地带解锁与轮换规则、等级随动机制、Herald of Terror 掉落优先级，以及六系破免护符的获取条件与 Patch 3.3 改动。",
-    "uber": "Uber 终局攻略：钥匙与传送门获取、三大 Uber boss 打法、盾击 Smiter 配装与抗性堆叠要求、掉落的暗金与地狱火炬属性。",
-    "tips": "综合技巧汇总：技能与属性点重置（赦罪令牌 / 赫拉迪克方块）、方块合成配方、掉落与 MF 常识、常用交易术语与暗语速查。",
-    "farming": "速刷与 MF 指南：85 场景推荐表、纯冰法高 MF 配装模板、佣兵 Infinity 破冰免、劳模/安姐/暗黑速刷循环与卓古拉之握掉落路线。",
+    "uber": "Uber 终局攻略：钥匙与传送门获取、三大 Uber 首领打法、盾击 Smiter 配装与抗性堆叠要求、掉落的暗金与地狱火炬属性。",
+    "tips": "综合技巧汇总：技能与属性点重置（赦免徽章 / 赫拉迪姆方块）、方块合成配方、掉落与 MF 常识、常用交易术语与暗语速查。",
+    "farming": "速刷与 MF 指南：85 场景推荐表、纯冰法高 MF 配装模板、佣兵 Infinity 破冰免、劳模/安姐/暗黑速刷循环与德古拉之握掉落路线。",
 }
 GUIDE_KW = {
     "runewords": "符文之语,Runewords,配方,Ist,Ber,Mosaic,底材",
     "leveling": "练级,开荒,1-85级,练级路线,练级暗金",
     "terror-zones": "恐怖地带,Terror Zones,破免护符,Sunder Charms,Herald of Terror",
     "uber": "Uber,Uber终局,地狱火炬,Smiter,盾击,超级boss",
-    "tips": "综合技巧,赫拉迪克方块,重置属性,赦罪令牌,交易术语,MF常识",
-    "farming": "速刷,MF,Magic Find,85场景,劳模,安姐,卓古拉之握",
+    "tips": "综合技巧,赫拉迪姆方块,重置属性,赦免徽章,交易术语,MF常识",
+    "farming": "速刷,MF,Magic Find,85场景,劳模,安姐,德古拉之握",
 }
 
 CHRONICLE_DESC = ("暗黑破坏神 II：复活（D2R）收藏编年史：99 条符文之语配方、34 套套装共 135 件部件与 388 件独特道具"
@@ -1674,6 +1679,9 @@ def home():
         ("🏆 " + bi("天梯第 15 赛季", "Ladder Season 15"), "",
          bi("2026 年 8 月 21 日开启（3.3 补丁同步上线）。定期重置的天梯赛季，冲级、竞速、专属奖励，是新 meta 的试验场。",
             "Opened 21 August 2026 alongside patch 3.3. Ladder seasons reset periodically — leveling races, speed runs and ladder-only rewards make them the proving ground for every new meta.")),
+        ("🆕 " + bi("3.4 补丁 / 第 16 赛季", "Patch 3.4 / Season 16"), "",
+         bi("2026 年 11 月 13 日开启。官方补丁说明<b>没有新增符文之语</b>，只重做了 <b>Eternity（永恒）</b>（底材扩至远程武器、提速提伤、按等级加最大伤害）；第 15 赛季的 10 件天梯专属暗金/套装转入非天梯，旧季角色可直接使用。",
+            "Opens 13 November 2026. The patch notes <b>add no new runewords</b>; they only rebuild <b>Eternity</b> (missile bases, more speed and damage, max damage by character level). Ten Season 15 ladder-only uniques/sets move to non-ladder for existing characters.")),
     ]
     feat_cards = "".join('<div class="card"><h3>' + a + '</h3><p style="color:var(--muted)">' + c + '</p></div>' for a, b, c in feat)
     guides = [
@@ -1681,10 +1689,10 @@ def home():
          bi("经典与新版符文之语汇总", "Classic and new runewords in one table"), "guides/runewords.html"),
         ("⚔️", bi("练级与开荒", "Leveling & Early Game"),
          bi("1-99 路线与效率点", "1–99 route and the most efficient spots"), "guides/leveling.html"),
-        ("🌑", bi("恐怖地带 & Sunder", "Terror Zones & Sunder"),
+        ("🌑", bi("恐怖地带与破免", "Terror Zones & Sunder"),
          bi("破免护符与刷图", "Sunder Charms and where to farm"), "guides/terror-zones.html"),
         ("👹", bi("Uber 终局", "Uber Endgame"),
-         bi("超级 boss 与暗金", "Uber bosses and their uniques"), "guides/uber.html"),
+         bi("Uber 首领与暗金", "Uber bosses and their uniques"), "guides/uber.html"),
         ("💡", bi("综合技巧", "General Tips"),
          bi("重置、配方、交易等", "Respecs, cube recipes, trading and more"), "guides/tips.html"),
         ("🪙", bi("速刷与 MF 指南", "Farming & MF Guide"),
@@ -1697,21 +1705,21 @@ def home():
     body += '<section class="hero"><div class="wrap">\n' + SIGIL + '\n<h1>' \
             + bi("暗黑破坏神 II：复活", "Diablo II: Resurrected") + '</h1>\n' \
             '<p class="sub">' \
-            + bi("Diablo II: Resurrected 全职业玩法加点 · 流派 Build · 游戏技巧静态攻略站。涵盖八大职业的详细技能树、主流流派、装备思路与开荒/终局技巧。已同步 <b>Patch 3.3 / 天梯第 15 赛季</b>。",
-                 "A static Diablo II: Resurrected guide site for skill allocation, builds and gameplay tips — detailed skill trees, meta builds, gear plans and leveling/endgame tricks for all eight classes. Updated for <b>Patch 3.3 / Ladder Season 15</b>.") \
+            + bi("Diablo II: Resurrected 全职业玩法加点 · 流派 Build · 游戏技巧静态攻略站。涵盖八大职业的详细技能树、主流流派、装备思路与开荒/终局技巧。已同步 <b>Patch 3.4 / 天梯第 16 赛季</b>（2026-11-13 开启）。",
+                 "A static Diablo II: Resurrected guide site for skill allocation, builds and gameplay tips — detailed skill trees, meta builds, gear plans and leveling/endgame tricks for all eight classes. Updated for <b>Patch 3.4 / Ladder Season 16</b> (opens 13 Nov 2026).") \
             + '</p>\n' \
             '<div style="margin-top:18px">\n  <a class="btn" href="classes/amazon.html">' \
             + bi("浏览职业", "Browse Classes") + '</a>\n' \
             '  <a class="btn" href="guides/runewords.html">' \
             + bi("符文之语图鉴", "Runewords Codex") + '</a>\n</div>\n</div></section>\n'
     body += '<div class="wrap" style="padding:34px 18px 10px">\n' \
-            '  <h2 class="section-id" id="feat">' + bi("当前版本核心机制", "Core Mechanics This Patch") + ' <small style="font-weight:400;color:var(--muted)">· ' + bi("Patch 3.3 / 天梯第 15 赛季（2026-08-21 开启）", "Patch 3.3 / Ladder Season 15 (opened 21 Aug 2026)") + '</small></h2>\n  <div class="grid cols2">' + feat_cards + '</div>\n' \
+            '  <h2 class="section-id" id="feat">' + bi("当前版本核心机制", "Core Mechanics This Patch") + ' <small style="font-weight:400;color:var(--muted)">· ' + bi("Patch 3.4 / 天梯第 16 赛季（2026-11-13 开启）", "Patch 3.4 / Ladder Season 16 (opens 13 Nov 2026)") + '</small></h2>\n  <div class="grid cols2">' + feat_cards + '</div>\n' \
             '  <h2 class="section-id" id="classes" style="margin-top:30px">' + bi("八大职业总览", "All Eight Classes") + '</h2>\n  <div class="grid cls">' + "".join(cls_cards) + '</div>\n' \
             '  <h2 class="section-id" id="guides" style="margin-top:30px">' + bi("攻略专题", "Guide Topics") + '</h2>\n  <div class="grid cols3">' + guide_cards + '</div>\n' \
             '  <div class="callout info" style="margin-top:30px">\n    <b>' \
             + bi("关于本攻略：", "About this guide:") + '</b>' \
-            + bi("内容基于 D2R <b>Patch 3.3 / 天梯第 15 赛季</b>（2026-08-21 开启）的 meta 整理：破免获取被推回地狱难度、Herald 掉落上位、练级暗金集体加强、上一批天梯符文之语转入非天梯、术士经历一轮修正。偏向 PvM 单人/组队开荒与终局 farm。技能与属性点现在均可重置（赦罪令牌 / 工坊），大胆尝试不同流派即可。",
-                 "Everything here is built around the <b>Patch 3.3 / Ladder Season 15</b> meta (opened 21 Aug 2026): Sunder access pushed back into Hell, Heralds promoted as the farming target, leveling uniques buffed across the board, last season's ladder runewords moved to non-ladder, and the Warlock going through a round of corrections. The focus is PvM — solo/party progression and endgame farming. Skills and stats can be respecced freely (Token of Absolution / Horadric Cube), so feel free to experiment with builds.") \
+            + bi("内容基于 D2R <b>Patch 3.3 / 天梯第 15 赛季</b>（2026-08-21 开启）的 meta 整理：破免获取被推回地狱难度、Herald 掉落上位、练级暗金集体加强、上一批天梯符文之语转入非天梯、术士经历一轮修正。<b>3.4（第 16 赛季，2026-11-13 开启）未新增符文之语</b>，只重做 Eternity 并把 10 件天梯专属暗金/套装转入非天梯，站内已在符文之语页与练级页同步。偏向 PvM 单人/组队开荒与终局 farm。技能与属性点现在均可重置（赦免徽章 / 工坊），大胆尝试不同流派即可。",
+                 "Everything here is built around the <b>Patch 3.3 / Ladder Season 15</b> meta (opened 21 Aug 2026): Sunder access pushed back into Hell, Heralds promoted as the farming target, leveling uniques buffed across the board, last season's ladder runewords moved to non-ladder, and the Warlock going through a round of corrections. <b>Patch 3.4 (Season 16, opens 13 Nov 2026) adds no new runewords</b> — it only rebuilds Eternity and moves ten ladder-only uniques/sets to non-ladder, now covered on the Runewords and Leveling pages. The focus is PvM — solo/party progression and endgame farming. Skills and stats can be respecced freely (Token of Absolution / Horadric Cube), so feel free to experiment with builds.") \
             + '\n  </div>\n</div>\n'
     return page("暗黑破坏神 II：复活攻略站 · 全职业加点与流派 Build", 0, body, "home",
                 desc=HOME_DESC, en_t="Diablo II: Resurrected Guide — Builds, Skills & Tips", keywords=HOME_KW)
@@ -1785,7 +1793,7 @@ def amazon():
          (bi("敏捷", "Dexterity"), bi("刚好穿装备或堆格挡", "Enough for gear, or stack block")),
          (bi("体力", "Vitality"), bi("其余全加", "Everything else")),
          (bi("能量", "Energy"), bi("不加（靠装备/吸蓝）", "None (gear/mana leech)"))],
-        [bi("武器：Titan's Revenge（泰坦标枪）", "Weapon: Titan's Revenge"),
+        [bi("武器：Titan's Revenge（泰坦的复仇）", "Weapon: Titan's Revenge"),
          bi("头盔：Griffon's Eye（电珠） / +2 标枪头环", "Helm: Griffon's Eye (lightning facet) / +2 javelin circlet"),
          bi("项链：Mara's Kaleidoscope / 高施项链", "Amulet: Mara's Kaleidoscope / caster amulet"),
          bi("腰带：Razortail（穿刺）", "Belt: Razortail (pierce)"),
@@ -2086,13 +2094,13 @@ def paladin():
             '<p>' + bi("圣骑士是「光环 + 祝福之锤」的代名词，也是开荒与终局最稳的近战/法系混合职业。祝福之锤圣骑士几乎能单人打通全剧并高效 farm，是新手与老玩家共同的首选。",
                        "The Paladin is synonymous with auras and Blessed Hammer, and he is the most reliable melee/caster hybrid for both progression and endgame. A Hammerdin can solo the entire game and farm efficiently, which is why veterans and beginners alike pick him first.") + '</p>\n' \
             '<div class="callout tip"><b>' + bi("定位：", "Role:") + '</b>' \
-            + bi("魔法锤 / 近战 / 辅助 · 优势：祝福之锤全能、光环团队增益、盾击专克超级Boss · 劣势：锤子需练手（螺旋弹道）、近战流吃装备。",
+            + bi("魔法锤 / 近战 / 辅助 · 优势：祝福之锤全能、光环团队增益、盾击专克 Uber 首领 · 劣势：锤子需练手（螺旋弹道）、近战流吃装备。",
                  "Magic hammers / melee / support · Pros: Blessed Hammer does everything, auras buff the party, Smite hard-counters Uber bosses · Cons: hammers take practice (spiral trajectory) and melee builds are gear hungry.") + '</div>'
     trees = skilltrees([
         ("Combat", bi("近战攻击技能，含盾击与热诚。", "Melee attacks, including Smite and Zeal."),
          ["Sacrifice / Zeal", bi("Smite（必中）", "Smite (always hits)"), "Charge", "Holy Shield", "Vengeance / Conversion"]),
         ("Offensive", bi("光环为主，强化自身与队伍。", "Mostly auras that buff you and your party."),
-         ["Might", bi("Holy Fire / Holy Frost / Holy Shock（元素光环）", "Holy Fire / Holy Frost / Holy Shock (elemental auras)"),
+         ["Might", bi("Holy Fire / Holy Freeze / Holy Shock（元素光环）", "Holy Fire / Holy Freeze / Holy Shock (elemental auras)"),
           "Fanaticism", bi("Conviction（降抗）", "Conviction (resist reduction)"), "Sanctuary / Blessed Aim"]),
         ("Defensive", bi("祝福之锤与防护光环所在系。", "Home of Blessed Hammer and the protective auras."),
          [bi("Prayer / Cleansing / Meditation（回复光环）", "Prayer / Cleansing / Meditation (recovery auras)"),
@@ -2142,7 +2150,7 @@ def paladin():
          (bi("敏捷", "Dexterity"), bi("开圣盾后堆格挡 75%，其余加敏提伤害", "75% block with Holy Shield up, then more Dex for damage")),
          (bi("体力", "Vitality"), bi("保证生存", "Enough to stay alive")),
          (bi("能量", "Energy"), bi("不加", "None"))],
-        [bi("武器：Grief（悲伤，核心）/ 死灵法杖备选", "Weapon: Grief (core) / a phase blade alternative"),
+        [bi("武器：Grief（悔恨，核心）/ 死灵法杖备选", "Weapon: Grief (core) / a phase blade alternative"),
          bi("盾：Herald of Zakarum / 暗金圣盾（击回）", "Shield: Herald of Zakarum / a unique paladin shield with hit recovery"),
          bi("头盔：Guillaume's / 头环", "Helm: Guillaume's Face / a rare circlet"),
          bi("甲：Fortitude / Chains of Honor", "Armor: Fortitude / Chains of Honor"),
@@ -2190,7 +2198,7 @@ def paladin():
            + bi("祝福之锤沿螺旋轨迹飞行，需练习站位让锤子扫过怪群；Vigor 提升移动与锤速。",
                 "Hammers spiral outward, so you must position yourself for them to sweep through the pack; Vigor speeds up both you and the hammers.") + '</li>' \
            '<li><b>' + bi("Smiter 打 Uber：", "Smiters for Ubers:") + '</b>' \
-           + bi("盾击（Smite）必中且无视格挡，配合 Grief + 暗金圣盾专杀超级 boss。",
+           + bi("盾击（Smite）必中且无视格挡，配合 Grief + 暗金圣盾专杀 Uber 首领。",
                 "Smite always hits and ignores block; with Grief and a unique paladin shield it deletes Uber bosses.") + '</li>' \
            '<li><b>' + bi("Fanaticism / Conviction：", "Fanaticism / Conviction:") + '</b>' \
            + bi("狂热给物理输出，信念降抗，是组队核心光环。",
@@ -2318,7 +2326,7 @@ def barbarian():
            + bi("Berserk（魔法伤，无视免疫）+ Find Item，The Pit 刷装备效率第一。",
                 "Berserk (magic damage, ignores physical immunity) plus Find Item makes The Pit the fastest gear farm in the game.") + '</li>' \
            '<li><b>' + bi("Patch 3.3 让野蛮人变强了：", "Patch 3.3 made the Barbarian stronger:") + '</b>' \
-           + bi("<b>Bloodletter（放血者）</b>新增 +20% 跑速且能更早拿到（物品等级 34→30、需求等级 25→17），<b>Manald Heal（玛那德之愈）</b>新增 +10% 施法速度，两条加起来让「双持放血者旋风」第一次成为有竞争力的<b>天梯起步</b>路线；此外 <b>Leap 落地动画卡死</b>的 bug 也已修复。往年想练野蛮人但嫌开荒太吃装备的话，本季是个好时机。",
+           + bi("<b>Bloodletter（放血者）</b>新增 +20% 跑速且能更早拿到（物品等级 34→30、需求等级 25→17），<b>Manald Heal（玛那德的治疗）</b>新增 +10% 施法速度，两条加起来让「双持放血者旋风」第一次成为有竞争力的<b>天梯起步</b>路线；此外 <b>Leap 落地动画卡死</b>的 bug 也已修复。往年想练野蛮人但嫌开荒太吃装备的话，本季是个好时机。",
                 "<b>Bloodletter</b> gains +20% run speed and drops much earlier (item level 34→30, required level 25→17), and <b>Manald Heal</b> gains +10% faster cast rate — together they make dual-Bloodletter Whirlwind a genuinely competitive <b>Ladder starter</b> for the first time. The Leap landing-animation lock was also fixed. If you've always wanted to play a Barbarian but found the early Ladder too gear-dependent, this is the season to try it.") + '</li>' \
            '</ul></div>'
     return _class_page("野蛮人 Barbarian", "c:barbarian", intro, trees, builds, tips, "paladin.html", "圣骑士 Paladin", "druid.html", "德鲁伊 Druid")
@@ -2357,7 +2365,7 @@ def druid():
          (bi("能量", "Energy"), bi("少量或不加", "Little to none"))],
         [bi("武器：Heart of the Oak（橡树之心）", "Weapon: Heart of the Oak"),
          bi("盾：Spirit Monarch", "Shield: Spirit Monarch"),
-         bi("头盔：Jalal's Mane（加洛面具）/ +2 风 头环", "Helm: Jalal's Mane / +2 elemental circlet"),
+         bi("头盔：Jalal's Mane（加尔的鬃毛）/ +2 风 头环", "Helm: Jalal's Mane / +2 elemental circlet"),
          bi("甲：Enigma / Skin of Vipermagi", "Armor: Enigma / Skin of the Vipermagi"),
          bi("腰带：Arachnid Mesh", "Belt: Arachnid Mesh"),
          bi("项链：Mara's / +2 风 20FCR", "Amulet: Mara's / +2 elemental, 20 FCR"),
@@ -2486,7 +2494,7 @@ def warlock():
          (bi("能量", "Energy"), bi("少量（靠装备回蓝）", "A little (rely on gear for mana)"))],
         [bi("武器：Heart of the Oak（橡树之心） / 术士专属暗金法杖", "Weapon: Heart of the Oak / a Warlock-only unique staff"),
          bi("盾：Spirit Monarch（精神）", "Shield: Spirit Monarch"),
-         bi("头盔：+2 恶魔 头环 / Shako（军帽）", "Helm: +2 Demon circlet / Harlequin Crest"),
+         bi("头盔：+2 恶魔 头环 / Shako（谐角之冠）", "Helm: +2 Demon circlet / Harlequin Crest"),
          bi("甲：Enigma（谜团）/ Chains of Honor（荣耀之链）", "Armor: Enigma / Chains of Honor"),
          bi("腰带：Arachnid Mesh（蜘蛛之网）", "Belt: Arachnid Mesh"),
          bi("项链：Mara's（马拉）/ +2 恶魔 20FCR", "Amulet: Mara's / +2 Demon, 20 FCR"),
@@ -2514,11 +2522,11 @@ def warlock():
          (bi("敏捷", "Dexterity"), bi("刚好穿武器", "Just enough for your weapon")),
          (bi("体力", "Vitality"), bi("其余全加", "Everything else")),
          (bi("能量", "Energy"), bi("不加", "None"))],
-        [bi("武器：高 ED 双手武器（Death / Grief（悲伤））或术士专属双手暗金", "Weapon: a high-ED two-hander (Death / Grief) or a Warlock-only two-handed unique"),
+        [bi("武器：高 ED 双手武器（Death / Grief（悔恨））或术士专属双手暗金", "Weapon: a high-ED two-hander (Death / Grief) or a Warlock-only two-handed unique"),
          bi("副手：Spirit Monarch（精神）/ 术士专属副手", "Offhand: Spirit Monarch / a Warlock-only offhand"),
-         bi("头盔：Arreat's Face（亚瑞特之脸）/ Guillaume's（纪尧姆之颅）", "Helm: Arreat's Face / Guillaume's Face"),
+         bi("头盔：Arreat's Face（亚瑞特的面容）/ Guillaume's（吉永之脸）", "Helm: Arreat's Face / Guillaume's Face"),
          bi("甲：Fortitude（刚毅）/ Enigma（谜团）", "Armor: Fortitude / Enigma"),
-         bi("腰带：String of Ears（耳串）", "Belt: String of Ears"),
+         bi("腰带：String of Ears（长串之耳）", "Belt: String of Ears"),
          bi("项链：Highlord's Wrath（大君之怒）/ Mara's（马拉）", "Amulet: Highlord's Wrath / Mara's"),
          bi("戒指：Raven Frost + 婚戒 / SoJ（乔丹之石）", "Rings: Raven Frost + Bul-Kathos' Wedding Band / SoJ"),
          bi("靴：Gore Rider（蚀肉骑士）", "Boots: Gore Rider"),
@@ -2544,7 +2552,7 @@ def warlock():
          (bi("敏捷", "Dexterity"), bi("不加", "None")),
          (bi("体力", "Vitality"), bi("其余全加", "Everything else")),
          (bi("能量", "Energy"), bi("少量（靠回蓝装）", "A little (use mana regen gear)"))],
-        [bi("武器：Heart of the Oak（橡树之心）/ Obsession（痴迷）", "Weapon: Heart of the Oak / Obsession"),
+        [bi("武器：Heart of the Oak（橡树之心）/ Obsession（执着）", "Weapon: Heart of the Oak / Obsession"),
          bi("盾：Spirit Monarch（精神）", "Shield: Spirit Monarch"),
          bi("头盔：Nightwing's Veil（夜翼面纱）/ +2 混沌 头环", "Helm: Nightwing's Veil / +2 Chaos circlet"),
          bi("甲：Enigma（谜团）/ Tal Rasha's（塔拉夏）", "Armor: Enigma / Tal Rasha's"),
@@ -2575,7 +2583,7 @@ def warlock():
          (bi("敏捷", "Dexterity"), bi("不加", "None")),
          (bi("体力", "Vitality"), bi("其余全加", "Everything else")),
          (bi("能量", "Energy"), bi("少量（靠回蓝装）", "A little (use mana regen gear)"))],
-        [bi("武器：Heart of the Oak（橡树之心）/ Obsession（痴迷）", "Weapon: Heart of the Oak / Obsession"),
+        [bi("武器：Heart of the Oak（橡树之心）/ Obsession（执着）", "Weapon: Heart of the Oak / Obsession"),
          bi("副手：Grimoire（魔典，触发单手拿双手武器）", "Offhand: a Grimoire (enables holding a two-hander one-handed)"),
          bi("头盔：+2 混沌头环 / 火焰技能头环", "Helm: +2 Chaos circlet / a fire-skills circlet"),
          bi("甲：Enigma（谜团）/ Chains of Honor（荣耀之链）", "Armor: Enigma / Chains of Honor"),
@@ -2658,7 +2666,7 @@ def assassin():
                 bi("Cloak of Shadows 致盲保命", "Cloak of Shadows blinds for safety"),
                 bi("Mind Blast 眩晕危险怪", "Mind Blast stuns dangerous foes"),
                 bi("三系伤害几乎无免疫盲点", "Three damage types leave almost no immunity gap")])
-    builds += build_card(bi("马赛克武学刺客", "Mosaic Martial Arts"),
+    builds += build_card(bi("模糊武学刺客", "Mosaic Martial Arts"),
                bi("S 级 · 全屏元素", "S-Tier · Screen-wide Elemental"),
                bi("双持 Mosaic 爪实现 100% 不消耗蓄力，蓄好 Phoenix Strike / Claws of Thunder / Blades of Ice 后狂踩 Dragon Talon，全屏火/电/冰齐发，当前版本顶级战力。",
                   "Dual Mosaic claws give a 100% chance not to consume charges; bank Phoenix Strike / Claws of Thunder / Blades of Ice, then spam Dragon Talon to unleash screen-wide fire/lightning/cold — a top-tier build in the current patch."),
@@ -2732,21 +2740,30 @@ def g_runewords():
         ("Spirit", "Tal + Thul + Ort + Amn", bi("4 孔 剑 / 盾", "4-socket Sword / Shield"), bi("+2 技能、FCR、FHR、抗性，性价比之王（剑+盾常见）。", "+2 skills, FCR, FHR and resists — the king of value (sword + shield is common).")),
         ("Heart of the Oak", "Ko + Vex + Pul + Thul", bi("4 孔 法杖/杖", "4-socket Stave/Wand"), bi("+3 技能、全抗、回蓝、FHR，法系通用武器。", "+3 skills, all resists, mana regen and FHR — a general-purpose caster weapon.")),
         ("Fortitude", "El + Sol + Dol + Lo", bi("4 孔 甲/武器", "4-socket Armor/Weapon"), bi("300% ED、高抗、生命，近战/佣兵毕业甲。", "300% ED, high resists and life — the best-in-slot armor for melee and mercenaries.")),
-        ("Call to Arms", "Amn + Ral + Mal + Ist + Ohm", bi("5 孔 武器", "5-socket Weapon"), bi("+战斗命令（BO），全队血/法上限，副手必备。", "+Battle Orders raises the whole party's life and mana — a must-have on your swap weapon.")),
+        ("Call to Arms", "Amn + Ral + Mal + Ist + Ohm", bi("5 孔 武器", "5-socket Weapon"), bi("+战斗体制（BO），全队血/法上限，副手必备。", "+Battle Orders raises the whole party's life and mana — a must-have on your swap weapon.")),
         ("Grief", "Eth + Tir + Lo + Mal + Ral", bi("5 孔 剑/斧", "5-socket Sword/Axe"), bi("高 ED、无视目标防御、偷血，近战毕业武器。", "High ED, ignore target defense and life steal — the best-in-slot melee weapon.")),
         ("Chains of Honor", "Dol + Um + Ber + Ist", bi("4 孔 甲", "4-socket Body Armor"), bi("+2 技能、全抗、MF、偷血，全能甲。", "+2 skills, all resists, MF and life steal — an all-rounder armor.")),
-        ("Death's Web", "Vex + Hel + El + Eld + Zod + Eth", bi("6 孔 死灵法杖", "6-socket Necro Head"), bi("+2 毒骨、敌方毒抗 -50%，毒/骨死灵核心。", "+2 poison/bone and -50% enemy poison resist — the core weapon for poison and bone Necromancers.")),
+        ("Breath of the Dying", "Vex + Hel + El + Eld + Zod + Eth", bi("6 孔 武器", "6-socket Weapon"), bi("+350–400% ED、+60% IAS、全属性、双偷、杀死怪物安息，需 Zod 的终局武器。", "+350–400% ED, +60% IAS, all attributes, dual leech and slain monsters rest in peace — a Zod-tier endgame weapon.")),
+        ("Eternity", "Amn + Ber + Ist + Sol + Sur", bi("5 孔 近战/远程武器", "5-socket Melee/Missile Weapon"), bi("3.4 重做（仅术士君临线上天梯与离线生效）：+300–390% ED、+30% IAS、+9 最小伤害、按等级 +3–297 最大伤害、20% 压碎性打击、击中致盲目标、减速 33%、生命回复 +16、法力回复 16%、无法冰冻、7% 偷血、30% MF、+5 重生（o skill）、无法破坏；底材已扩至远程武器。", "Rebuilt in 3.4 (RotW online Ladder and Offline only): +300–390% ED, +30% IAS, +9 min damage, +3–297 max damage by character level, 20% Crushing Blow, Hit Blinds Target, Slows Target 33%, Replenish Life +16, Regenerate Mana 16%, Cannot Be Frozen, 7% life steal, 30% MF, +5 Revive (o skill) and indestructible; the base now includes missile weapons.")),
+        ("Authority", "Hel + Shael + Ral", bi("3 孔 甲", "3-socket Body Armor"), bi("2% 受击施放 10 级 Psychic Ward、10% 击中施放 15 级 Miasma Chain，+2 术士技能、+40–60% ED、需求 -15%、+20% FHR、火抗 +30%。", "2% chance to cast level 10 Psychic Ward when struck, 10% chance to cast level 15 Miasma Chain on striking, +2 Warlock skills, +40–60% ED, -15% requirements, +20% FHR and +30% fire resist.")),
+        ("Coven", "Ist + Ral + Io", bi("3 孔 头盔", "3-socket Helm"), bi("5% 受击施放 10 级 Sigil Lethargy，+1 全技能、20% FCR、+30–50% 防御、26–40% MF、+1–5 击杀回血、火抗 +30%、+10 活力。", "5% chance to cast level 10 Sigil Lethargy when struck, +1 all skills, 20% FCR, +30–50% defense, 26–40% MF, +1–5 life after each kill, +30% fire resist and +10 vitality.")),
+        ("Void", "Thul + Zod + Ist", bi("3 孔 匕首", "3-socket Dagger"), bi("+2 全技能、40% FCR、+10–15% 魔法技能伤害、+1–3 深渊、+8–12 全属性、4 级衰老（35 充能）、附加 3–14 冰伤、无法破坏、30% MF。", "+2 all skills, 40% FCR, +10–15% magic skill damage, +1–3 Abyss, +8–12 all attributes, level 4 Decrepify (35 charges), adds 3–14 cold damage, indestructible and 30% MF.")),
+        ("Vigilance", "Dol + Gul", bi("2 孔 盾/魔典/死灵头颅/圣骑士盾", "2-socket Shield/Grimoire/Necro Head/Paladin Shield"), bi("5% 受击施放 10 级 Ring of Fire，+10% 跑速、+30% FBR、+20–40 生命与法力、全抗 +25–35、+75–100% 防御、回复生命 +7、最大毒抗 +5%。", "5% chance to cast level 10 Ring of Fire when struck, +10% run/walk speed, +30% FBR, +20–40 life and mana, +25–35 all resists, +75–100% defense, replenish life +7 and +5% max poison resist.")),
+        ("Ritual", "Amn + Shael + Ohm", bi("3 孔 匕首", "3-socket Dagger"), bi("13% 受击施放 1 级 Sigil Death，+40% IAS、+250–320% ED、+150–250% 对恶魔伤害、+200–260% AR、+3–5 击杀回血、杀死怪物安息、7% 偷血。", "13% chance to cast level 1 Sigil Death when struck, +40% IAS, +250–320% ED, +150–250% damage to demons, +200–260% AR, +3–5 life after each kill, slain monsters rest in peace and 7% life steal.")),
     ]
     tr = "".join("<tr><td><b>%s</b></td><td><code>%s</code></td><td>%s</td><td>%s</td></tr>" % r for r in rows)
     body = '<h1><span class="zt"><span class="zc">符文之语图鉴 </span><span class="ec" lang="en">Runewords</span></span></h1>\n' \
-           '<p>' + bi("符文之语是将特定符文按顺序排列镶嵌到带孔装备中激活的强大词缀。下表汇集 D2R 当前版本最具代表性的符文之语，包括 2.4–2.6 赛季新增与经典终局装备。",
-                      "Runewords are powerful affixes you unlock by socketing specific runes in the right order into a socketed item. The table below collects the most representative runewords of the current D2R patch, including the season 2.4–2.6 additions and classic endgame gear.") + '</p>\n' \
+           '<p>' + bi("符文之语是将特定符文按顺序排列镶嵌到带孔装备中激活的强大词缀。下表汇集 D2R 当前版本最具代表性的符文之语：2.4 起的赛季新增、3.0「术士君临」的五个新符文之语、3.4 调整，以及经典终局装备。",
+                      "Runewords are powerful affixes you unlock by socketing specific runes in the right order into a socketed item. The table below collects the most representative runewords of the current D2R patch: the season additions from 2.4 onward, the five new runewords of 3.0 Reign of the Warlock, the 3.4 changes, and classic endgame gear.") + '</p>\n' \
            '<div class="callout info"><b>' + bi("提示：", "Tip:") + '</b>' \
            + bi("符文顺序与孔数必须完全匹配，且底材类型/品质需符合（普通/卓越/精英）。高符文（Vex、Ohm、Lo、Ber、Jah、Cham、Zod）极其珍贵，优先用于 Enigma / Infinity / Grief 等核心。",
                 "The rune order and socket count must match exactly, and the base type/quality must qualify (normal/exceptional/elite). High runes (Vex, Ohm, Lo, Ber, Jah, Cham, Zod) are extremely precious — prioritise them for core runewords like Enigma, Infinity and Grief.") + '</div>\n' \
-           '<div class="callout info"><b>' + bi("第 15 赛季轮转：", "Season 15 rotation:") + '</b>' \
+           '<div class="callout info"><b>' + bi("第 15 赛季轮转（已生效）：", "Season 15 rotation (live):") + '</b>' \
            + bi("每个新赛季开始时会例行把上一批「天梯专属」内容开放给非天梯。本季轮到的是 Mania、Hysteria、Metamorphosis、Ground、Temper、Hearth、Cure、Bulwark 这八个符文之语；<b>术士君临</b>资料片下另有经过数值调整的新版天梯专属接管，所以新旧版本的实际词缀会有差异。开局前先确认你手上的版本属于哪一批。",
                 "At the start of each new season, the previous batch of \"ladder-only\" content is routinely opened up to non-ladder. This time it's the eight runewords Mania, Hysteria, Metamorphosis, Ground, Temper, Hearth, Cure and Bulwark; <b>Reign of the Warlock</b> ships numerically adjusted new ladder-only versions to take over, so the actual affixes differ between old and new. Check which batch you're holding before you commit resources.") + '</div>\n' \
+           '<div class="callout info"><b>' + bi("3.4 补丁（第 16 赛季）：", "Patch 3.4 (Season 16):") + '</b>' \
+           + bi("官方补丁说明<b>没有新增符文之语</b>，只重做了 <b>Eternity（永恒）</b>：底材由 5 孔近战武器扩大到近战/远程武器，攻速与伤害上调，并新增按角色等级提升最大伤害（完整词缀见下表）。该改动<b>只在术士君临线上天梯与离线生效</b>，线上非天梯沿用旧版。同时第 15 赛季的 10 件天梯专属暗金/套装转入非天梯（清单见练级页）。",
+                "The official patch notes <b>add no new runewords</b> and only rebuild <b>Eternity</b>: its base expands from 5-socket melee weapons to melee and missile weapons, attack speed and damage go up, and it gains max damage by character level (full affix list in the table below). These changes apply <b>only to RotW online Ladder and Offline</b>; online non-ladder keeps the old version. The ten Season 15 ladder-only uniques/sets also move to non-ladder (see the Leveling guide for the list).") + '</div>\n' \
            '<div class="card">\n<table><thead><tr><th>' + bi("符文之语", "Runeword") + '</th><th>' + bi("符文顺序", "Rune Order") + '</th><th>' + bi("底材", "Base") + '</th><th>' + bi("核心价值", "Core Value") + '</th></tr></thead><tbody>' + tr + '</tbody></table>\n</div>\n' \
            '<div class="callout tip"><b>' + bi("平民起步推荐：", "Budget starters:") + '</b>' \
            + bi("Spirit（剑+盾）、Stealth（Tal+Eth 甲，+25% 移速）、Ancient's Pledge、Lore（Ort+Sol 头盔，+1 技能）、Smoke、Treachery 等，开荒期极其实用。",
@@ -2764,35 +2781,35 @@ def g_leveling():
            '<tr><td>25–40</td><td>Tombs（A2）、Maggot Lair、Arcane Sanctuary</td><td>' + bi("法师用 Teleport 效率拉满；Countess 刷符文（Tal-Thul-Io 等）。", "Sorceress maxes efficiency with Teleport; farm the Countess for runes (Tal-Thul-Io, etc.).") + '</td></tr>' \
            '<tr><td>40–60</td><td>Chaos Sanctuary（A4）、Pits（A1）、Ancient Tunnels（A2）</td><td>' + bi("Chaos 是高经验密度经典点；Pits 无冰免适合冰法。", "Chaos is a classic high-XP spot; the Pits have no cold immunes, great for cold Sorcs.") + '</td></tr>' \
            '<tr><td>60–80</td><td>Terror Zones, Cows ' + bi("（牛场）", "(Cow Level)") + ', Baal ' + bi("跑步", "runs") + '</td><td>' + bi("恐怖地带经验爆表；牛场密度高适合 AoE。", "Terror Zones are XP gold; the Cow level is dense and great for AoE.") + '</td></tr>' \
-           '<tr><td>80–99</td><td>Terror Zones ' + bi("（高密度）", "(high density)") + ', Pits, Chaos, Ubers ' + bi("刷符文", "for runes") + '</td><td>' + bi("配合 Sunder Charm 与 MF 装；组队高 PP 经验更高。", "With Sunder Charms and MF gear; higher player count in a party means more XP.") + '</td></tr>' \
+           '<tr><td>80–99</td><td>Terror Zones ' + bi("（高密度）", "(high density)") + ', Pits, Chaos, Uber 首领 ' + bi("刷符文", "for runes") + '</td><td>' + bi("配合 Sunder Charm 与 MF 装；组队高 PP 经验更高。", "With Sunder Charms and MF gear; higher player count in a party means more XP.") + '</td></tr>' \
            '</tbody></table>\n</div>\n' \
            '<h2 class="section-id" id="tips">' + bi("开荒要点", "Progression Tips") + '</h2>\n<div class="card"><ul class="clean">' \
            '<li><b>' + bi("选对起手：", "Pick the right starter:") + '</b>' + bi("法师（传送）、召唤流死灵（安全）、祝福之锤圣骑士（全能）最适合开荒。", "Sorceress (Teleport), summon Necromancer (safe) or Hammerdin (all-round) suit progression best.") + '</li>' \
-           '<li><b>' + bi("女伯爵刷符文：", "The Countess for runes:") + '</b>' + bi("A1 监狱塔的女伯爵必掉符文，是精神 / 潜行等低符文来源。", "The Countess in the A1 prison tower always drops runes — your source for low runes like Spirit / Stealth.") + '</li>' \
+           '<li><b>' + bi("女伯爵刷符文：", "The Countess for runes:") + '</b>' + bi("A1 监狱塔的女伯爵必掉符文，是精神 / 隐密等低符文来源。", "The Countess in the A1 prison tower always drops runes — your source for low runes like Spirit / Stealth.") + '</li>' \
            '<li><b>' + bi("免费鉴定：", "Free identify:") + '</b>' + bi("救出凯恩后回城可免费鉴定全部物品。", "Rescue Cain, then identify everything for free in town.") + '</li>' \
-           '<li><b>' + bi("Terror Zones 轮换：", "Terror Zone rotation:") + '</b>' + bi("每小时换区，重开游戏即可刷新查看当前恐怖地带。", "It shifts hourly; restart the game to refresh and see the current zone.") + '</li>' \
+           '<li><b>' + bi("恐怖地带轮换：", "Terror Zone rotation:") + '</b>' + bi("每小时换区，重开游戏即可刷新查看当前恐怖地带。", "It shifts hourly; restart the game to refresh and see the current zone.") + '</li>' \
            '<li><b>' + bi("MF 与效率的平衡：", "Balance MF and speed:") + '</b>' + bi("MF 不是越高越好，优先保证击杀速度与存活。", "More MF is not always better — prioritise kill speed and survival.") + '</li>' \
            '<li><b>' + bi("共享仓库与符文：", "Shared stash and runes:") + '</b>' + bi("同账号角色共享仓库，用小号养大号符文。", "Characters on one account share a stash, so feed runes from alts to your main.") + '</li>' \
            '</ul></div>\n' \
-           '<h2 class="section-id" id="patch33">' + bi("Patch 3.3 练级装改动", "Patch 3.3 Leveling Gear Changes") + '</h2>\n<div class="card">\n' \
+           '<h2 class="section-id" id="patch33">' + bi("3.3 补丁练级装改动", "Patch 3.3 Leveling Gear Changes") + '</h2>\n<div class="card">\n' \
            '<p>' + bi("本季最大的好处是一批冷门低级暗金被救活了，开荒期「捡到就能穿」的选择明显变多（<b>改动仅在天梯模式生效</b>）：",
                       "The biggest win this season is a batch of overlooked low-level uniques being brought back to life, giving you far more \"wear whatever drops\" choices while leveling (<b>the changes apply in Ladder only</b>):") + '</p>\n' \
            '<table><thead><tr><th>' + bi("装备", "Item") + '</th><th>' + bi("改动", "Change") + '</th><th>' + bi("谁受益", "Who Benefits") + '</th></tr></thead><tbody>' \
-           '<tr><td><b>' + bi("天使之袍（套装）", "Angelic Raiment (set)") + '</b></td><td>' + bi("三件时 Sickle +6 伤害、Mantle 对不死 +100% 伤害；<b>全套额外 +1 全技能</b>", "At 3 pieces the Sickle gains +6 damage and the Mantle +100% damage to undead; <b>the full set adds +1 to all skills</b>") + '</td><td>' + bi("全职业练级，法系收益最高", "Everyone leveling, casters most") + '</td></tr>' \
+           '<tr><td><b>' + bi("天使的衣装（套装）", "Angelic Raiment (set)") + '</b></td><td>' + bi("三件时镰刀 +6 伤害、披风对不死 +100% 伤害；<b>全套额外 +1 全技能</b>", "At 3 pieces the Sickle gains +6 damage and the Mantle +100% damage to undead; <b>the full set adds +1 to all skills</b>") + '</td><td>' + bi("全职业练级，法系收益最高", "Everyone leveling, casters most") + '</td></tr>' \
            '<tr><td><b>' + bi("放血者", "Bloodletter") + '</b></td><td>' + bi("新增 +20% 跑步/行走速度", "Gains +20% faster run/walk") + '</td><td>' + bi("旋风野蛮人（可双持）", "Whirlwind Barbarian (dual-wield)") + '</td></tr>' \
-           '<tr><td><b>' + bi("战枝", "The Battlebranch") + '</b></td><td>' + bi("物品等级 34→30，需求等级 <b>25→17</b>", "Item level 34→30, required level <b>25→17</b>") + '</td><td>' + bi("近战在极早期就有可用武器", "Melee gets a usable weapon very early") + '</td></tr>' \
-           '<tr><td><b>' + bi("灰烬灾星", "Bane Ash") + '</b></td><td>' + bi("移除攻速与增强伤害，改为 <b>+20% 施法速度</b>", "Loses IAS and enhanced damage, gains <b>+20% faster cast rate</b>") + '</td><td>' + bi("早期法系练级", "Early caster leveling") + '</td></tr>' \
-           '<tr><td><b>' + bi("闪蝠之形", "Blinkbat's Form") + '</b></td><td>' + bi("跑速 10%→<b>30%</b>，并新增击杀回复 +1 法力", "Run speed 10%→<b>30%</b>, plus +1 mana after each kill") + '</td><td>' + bi("所有需要跑图的角色", "Every character that has to walk anywhere") + '</td></tr>' \
-           '<tr><td><b>' + bi("孤坟之脊", "Gravenspine") + '</b></td><td>' + bi("新增 +10% 施法速度", "Gains +10% faster cast rate") + '</td><td>' + bi("法系练级", "Caster leveling") + '</td></tr>' \
-           '<tr><td><b>' + bi("守望之盾", "The Ward") + '</b></td><td>' + bi("生成时自带 <b>1 个孔</b>", "Now comes with <b>1 socket</b>") + '</td><td>' + bi("早期镶符文/宝石", "Early rune or gem socketing") + '</td></tr>' \
-           '<tr><td><b>' + bi("玛那德之愈", "Manald Heal") + '</b></td><td>' + bi("新增 +10% 施法速度", "Gains +10% faster cast rate") + '</td><td>' + bi("法系与近战通用的练级戒指", "A leveling ring for both casters and melee") + '</td></tr>' \
-           '<tr><td><b>' + bi("啄目弓", "Pluckeye") + '</b></td><td>' + bi("新增 +25% 攻击速度", "Gains +25% increased attack speed") + '</td><td>' + bi("亚马逊早期", "Early Amazon") + '</td></tr>' \
-           '<tr><td><b>' + bi("罗格之弓", "Rogue's Bow") + '</b></td><td>' + bi("新增 +1~3 冰箭或火箭（限亚马逊）", "Gains +1-3 to Cold Arrow or Fire Arrow (Amazon only)") + '</td><td>' + bi("亚马逊弓系起步", "Starting bow Amazon") + '</td></tr>' \
+           '<tr><td><b>' + bi("战斗枝桠", "The Battlebranch") + '</b></td><td>' + bi("物品等级 34→30，需求等级 <b>25→17</b>", "Item level 34→30, required level <b>25→17</b>") + '</td><td>' + bi("近战在极早期就有可用武器", "Melee gets a usable weapon very early") + '</td></tr>' \
+           '<tr><td><b>' + bi("祸根之灰", "Bane Ash") + '</b></td><td>' + bi("移除攻速与增强伤害，改为 <b>+20% 施法速度</b>", "Loses IAS and enhanced damage, gains <b>+20% faster cast rate</b>") + '</td><td>' + bi("早期法系练级", "Early caster leveling") + '</td></tr>' \
+           '<tr><td><b>' + bi("闪蝠之躯", "Blinkbat's Form") + '</b></td><td>' + bi("跑速 10%→<b>30%</b>，并新增击杀回复 +1 法力", "Run speed 10%→<b>30%</b>, plus +1 mana after each kill") + '</td><td>' + bi("所有需要跑图的角色", "Every character that has to walk anywhere") + '</td></tr>' \
+           '<tr><td><b>' + bi("墓穴之脊", "Gravenspine") + '</b></td><td>' + bi("新增 +10% 施法速度", "Gains +10% faster cast rate") + '</td><td>' + bi("法系练级", "Caster leveling") + '</td></tr>' \
+           '<tr><td><b>' + bi("庇护结界", "The Ward") + '</b></td><td>' + bi("生成时自带 <b>1 个孔</b>", "Now comes with <b>1 socket</b>") + '</td><td>' + bi("早期镶符文/宝石", "Early rune or gem socketing") + '</td></tr>' \
+           '<tr><td><b>' + bi("玛那德的治疗", "Manald Heal") + '</b></td><td>' + bi("新增 +10% 施法速度", "Gains +10% faster cast rate") + '</td><td>' + bi("法系与近战通用的练级戒指", "A leveling ring for both casters and melee") + '</td></tr>' \
+           '<tr><td><b>' + bi("夺人目", "Pluckeye") + '</b></td><td>' + bi("新增 +25% 攻击速度", "Gains +25% increased attack speed") + '</td><td>' + bi("亚马逊早期", "Early Amazon") + '</td></tr>' \
+           '<tr><td><b>' + bi("侠盗之弓", "Rogue's Bow") + '</b></td><td>' + bi("新增 +1~3 冰箭或火箭（限亚马逊）", "Gains +1-3 to Cold Arrow or Fire Arrow (Amazon only)") + '</td><td>' + bi("亚马逊弓系起步", "Starting bow Amazon") + '</td></tr>' \
            '</tbody></table>\n</div>\n' \
            '<div class="callout warn"><b>' + bi("墨菲斯托不再能卡角：", "Mephisto can no longer be corner-trapped:") + '</b>' \
-           + bi("3.3 补丁修复了 Boss AI（含经典的柱子卡位打法），也修正了作为 Herald 出现的议会成员不掉战利品的问题。<b>后果</b>：开荒头几天靠刷劳模攒军帽、蛇皮这类日用品的速度会明显变慢，请预留更长的攒装周期，或改从恐怖地带 / Herald 入手。",
+           + bi("3.3 补丁修复了 Boss AI（含经典的柱子卡位打法），也修正了作为 Herald 出现的议会成员不掉战利品的问题。<b>后果</b>：开荒头几天靠刷劳模攒谐角之冠、蛇魔法师之皮这类日用品的速度会明显变慢，请预留更长的攒装周期，或改从恐怖地带 / Herald 入手。",
                 "Patch 3.3 fixed boss AI (including the classic pillar-trap trick) and fixed Council Members appearing as Heralds failing to drop loot. <b>Impact:</b> stockpiling staples like Harlequin Crest and Skin of Vipermagi off Mephisto in the first few days will be noticeably slower — budget a longer gearing window, or start from Terror Zones / Heralds instead.") + '</div>\n' \
-           '<div class="pager"><a href="runewords.html"><small>' + bi("上一攻略", "Prev Guide") + '</small>' + bi("符文之语图鉴", "Runewords") + '</a><a href="terror-zones.html"><small>' + bi("下一攻略", "Next Guide") + '</small>' + bi("恐怖地带 & Sunder", "Terror Zones & Sunder") + '</a></div>'
+           '<div class="pager"><a href="runewords.html"><small>' + bi("上一攻略", "Prev Guide") + '</small>' + bi("符文之语图鉴", "Runewords") + '</a><a href="terror-zones.html"><small>' + bi("下一攻略", "Next Guide") + '</small>' + bi("恐怖地带与破免", "Terror Zones & Sunder") + '</a></div>'
     return _guide_page("练级与开荒", "g:leveling", body)
 
 def g_terror():
@@ -2834,37 +2851,37 @@ def g_terror():
            + bi("不要再指望「堆到 500 MF 就能刷出破免」。本季更合理的路线是：先把等级推到 75 以上并站稳地狱，再用<b>能快速清高密度场景的流派</b>冲 Herald 层数和恐怖地带；MF 装仍有用，但优先级排在清场速度与生存之后。",
                 "Don't count on 'stack 500 MF and Sunders will come'. The stronger route this season: push past level 75 and get stable in Hell, then take a <b>build that clears dense zones fast</b> and push Herald tiers and Terror Zones. MF gear still helps, but it ranks below clear speed and survivability.") + '</div>\n' \
            '<div class="pager"><a href="leveling.html"><small>' + bi("上一攻略", "Prev Guide") + '</small>' + bi("练级与开荒", "Leveling") + '</a><a href="uber.html"><small>' + bi("下一攻略", "Next Guide") + '</small>' + bi("Uber 终局", "Uber Endgame") + '</a></div>'
-    return _guide_page("恐怖地带 & Sunder", "g:terror-zones", body)
+    return _guide_page("恐怖地带与破免", "g:terror-zones", body)
 
 def g_uber():
     body = '<h1><span class="zt"><span class="zc">Uber 终局内容 </span><span class="ec" lang="en">Uber Endgame</span></span></h1>\n' \
-           '<p>' + bi("D2R 的顶级 PvM 挑战：超级 boss 掉落毁灭（Annihilus）与小护身符（Torch），是终局玩家的标配。",
-                      "The top PvM challenge in D2R: super bosses drop the Annihilus and Hellfire Torch — staples for every endgame player.") + '</p>\n' \
+           '<p>' + bi("D2R 的顶级 PvM 挑战：Uber 首领掉落灭绝（小护身符）与地狱火炬（大护身符），是终局玩家的标配。",
+                      "The top PvM challenge in D2R: Uber bosses drop the Annihilus (small charm) and Hellfire Torch (large charm) — staples for every endgame player.") + '</p>\n' \
            '<h2 class="section-id" id="clone">' + bi("Diablo Clone 克隆", "Diablo Clone") + '</h2>\n<div class="card"><ul class="clean">' \
-           '<li>' + bi("游戏中会出现「<b>Diablo 在我们中间行走…</b>」世界消息，击杀掉落的 <b>Token of Absolution（赦罪令牌）</b> 可在工坊合成重置技能/属性书。",
-                       "A 'Diablo Walks the Earth…' world message appears; killing it drops the Token of Absolution, which you cube into a skill/stat reset book.") + '</li>' \
-           '<li>' + bi("高概率掉 <b>Annihilus（毁灭小符）</b>：+1 全技能、+属性、+抗、+经验，全职业必刷。",
-                       "High chance to drop the Annihilus charm: +1 all skills, +stats, +resists, +XP — a must-farm for every class.") + '</li>' \
+           '<li>' + bi("出现「<b>Diablo 在我们中间行走…</b>」世界消息后，前往指定区域击杀超级迪亚波罗。",
+                       "When the 'Diablo Walks the Earth…' world message appears, head to the designated zone and kill Diablo Clone.") + '</li>' \
+           '<li>' + bi("高概率掉 <b>灭绝（小护身符）</b>：+1 全技能、+属性、+抗、+经验，全职业必刷。",
+                       "High chance to drop the Annihilus small charm: +1 all skills, +stats, +resists, +XP — a must-farm for every class.") + '</li>' \
            '</ul></div>\n' \
-           '<h2 class="section-id" id="trist">' + bi("Uber Tristram 超级崔斯特姆", "Uber Tristram") + '</h2>\n<div class="card"><ul class="clean">' \
-           '<li>' + bi("用三把钥匙（恐怖/仇恨/毁灭，由 Nihlathak 等掉落）在工坊合成组织，进入红色崔斯特姆。",
-                       "Cube the three keys (Terror/Hatred/Destruction, dropped by Nihlathak and others) into an organ, then enter red Tristram.") + '</li>' \
-           '<li>' + bi("对手：Uber Mephisto、Uber Diablo、Uber Baal（均超高血量与免疫）。",
+           '<h2 class="section-id" id="trist">' + bi("Uber 红门（崔斯特姆）", "Uber Tristram") + '</h2>\n<div class="card"><ul class="clean">' \
+           '<li>' + bi("用三把钥匙（恐怖/仇恨/毁灭，由 Nihlathak 等掉落）在工坊合成器官，进入红色传送门后的崔斯特姆。",
+                       "Cube the three keys (Terror/Hatred/Destruction, dropped by Nihlathak and others) into organs, then enter Tristram through the red portal.") + '</li>' \
+           '<li>' + bi("对手：超级墨菲斯托、超级迪亚波罗、超级巴尔，均超高血量与免疫。",
                        "Foes: Uber Mephisto, Uber Diablo and Uber Baal (all with huge HP and immunities).") + '</li>' \
-           '<li>' + bi("掉 <b>Hellfire Torch（地狱火火炬）</b>：+3 职业技能、+属性、+抗，角色专属。",
+           '<li>' + bi("掉 <b>地狱火炬</b>：+3 职业技能、+属性、+抗，角色专属。",
                        "Drops the Hellfire Torch: +3 class skills, +stats, +resists, character-specific.") + '</li>' \
            '<li><b>' + bi("推荐打法：", "Recommended:") + '</b>' + bi("Smiter 圣骑士（Grief + 暗金圣盾 + 击回 + Decrepify 佣兵）最稳；Mosaic 刺客也可用。",
                        "A Smiter Paladin (Grief + unique paladin shield + life tap + Decrepify merc) is safest; a Mosaic Assassin also works.") + '</li>' \
            '</ul></div>\n' \
-           '<h2 class="section-id" id="mini">' + bi("Uber Andariel & Uber Duriel", "Uber Andariel & Uber Duriel") + '</h2>\n<div class="card"><ul class="clean">' \
-           '<li>' + bi("2.6+ 新增的超级安达利尔与超级都瑞尔，掉落专属材料用于升级暗金（如将部分暗金升级为精英底材）。",
+           '<h2 class="section-id" id="mini">' + bi("超级安达莉尔与超级都瑞尔", "Uber Andariel & Uber Duriel") + '</h2>\n<div class="card"><ul class="clean">' \
+           '<li>' + bi("2.6+ 新增的超级安达莉尔与超级都瑞尔，掉落专属材料用于升级暗金（如将部分暗金升级为精英底材）。",
                        "Added in 2.6+: Uber Andariel and Uber Duriel drop exclusive materials used to upgrade uniques (e.g. upgrade some uniques to elite bases).") + '</li>' \
            '<li>' + bi("机制类似，需要对应破免与高生存，组队更轻松。",
                        "Similar mechanics — needs the right Sunder and high survivability; easier in a group.") + '</li>' \
            '</ul></div>\n' \
            '<div class="callout tip"><b>' + bi("钥匙获取：", "Key farming:") + '</b>' + bi("在噩梦/地狱击杀 Nihlathak（A5）、Summoner（A2）、Smith（A1 监狱）等有几率掉三种钥匙，攒齐后挑战 Uber。",
                 "In Nightmare/Hell, Nihlathak (A5), the Summoner (A2) and the Smith (A1 prison) can drop the three keys; collect a set, then challenge the Ubers.") + '</div>\n' \
-           '<div class="pager"><a href="terror-zones.html"><small>' + bi("上一攻略", "Prev Guide") + '</small>' + bi("恐怖地带 & Sunder", "Terror Zones & Sunder") + '</a><a href="tips.html"><small>' + bi("下一攻略", "Next Guide") + '</small>' + bi("综合技巧", "Tips") + '</a></div>'
+           '<div class="pager"><a href="terror-zones.html"><small>' + bi("上一攻略", "Prev Guide") + '</small>' + bi("恐怖地带与破免", "Terror Zones & Sunder") + '</a><a href="tips.html"><small>' + bi("下一攻略", "Next Guide") + '</small>' + bi("综合技巧", "Tips") + '</a></div>'
     return _guide_page("Uber 终局", "g:uber", body)
 
 def g_tips():
@@ -2872,10 +2889,10 @@ def g_tips():
            '<p>' + bi("零散但关键的高手细节，覆盖重置、配方、交易与生存。",
                       "Scattered but crucial expert details covering respecs, recipes, trading and survival.") + '</p>\n' \
            '<div class="card"><h3>' + bi("① 重置与洗点", "1 · Respec & Resets") + '</h3><ul class="clean">' \
-           '<li><b>' + bi("Token of Absolution（赦罪令牌）：", "Token of Absolution:") + '</b>' + bi("集齐 4 种精华（每种 boss 掉），在工坊合成，可重置技能与属性。D2R 可多次洗点。",
+           '<li><b>' + bi("Token of Absolution（赦免徽章）：", "Token of Absolution:") + '</b>' + bi("集齐 4 种精华（每种 boss 掉），在工坊合成，可重置技能与属性。D2R 可多次洗点。",
                        "Collect the 4 essences (one per boss type), cube them to reset skills and stats. D2R allows repeated respecs.") + '</li>' \
            '<li><b>' + bi("活动代币：", "Event tokens:") + '</b>' + bi("部分活动/任务给的一次性洗点。", "Some events/quests grant a one-time respec.") + '</li></ul></div>\n' \
-           '<div class="card"><h3>' + bi("② 实用赫拉迪克方块配方", "2 · Useful Cube Recipes") + '</h3><ul class="clean">' \
+           '<div class="card"><h3>' + bi("② 实用赫拉迪姆方块配方", "2 · Useful Cube Recipes") + '</h3><ul class="clean">' \
            '<li>' + bi("3 同色碎宝石 → 1 高一级宝石；3 完美宝石 + 装备 → 修复（部分）。",
                       "3 flaw gems of one color → 1 gem of the next tier; 3 perfect gems + item → repair (some).") + '</li>' \
            '<li>' + bi("符文升级：3 个同符文 → 1 个高一级（如 3 Lem → 1 Pul），用于冲高符文。",
@@ -2903,39 +2920,39 @@ def g_tips():
 def g_farming():
     # 速刷场景排行（来自项目 MF.md）
     scene_rows = [
-        (bi("地狱 A1 地穴 Tamoe Highland", "Hell A1 — The Pit (Tamoe Highland)"), "85", bi("无冰免，怪物密度高", "No cold immunes, high monster density"), bi("纯冰法最稳的 85 场景，通关后首选", "The safest 85-area for a pure cold Sorc; first pick after clearing")),
-        (bi("地狱 A2 远古通道 Lost City", "Hell A2 — Lost City (Ancient Tunnels)"), "85", bi("怪少皮薄、无冰免", "Few, thin enemies, no cold immunes"), bi("传送清图极快，适合暴风雪速刷", "Teleport clears the map fast — great for Blizzard farming")),
+        (bi("地狱 A1 地穴（塔莫高地）", "Hell A1 — The Pit (Tamoe Highland)"), "85", bi("无冰免，怪物密度高", "No cold immunes, high monster density"), bi("纯冰法最稳的 85 场景，通关后首选", "The safest 85-area for a pure cold Sorc; first pick after clearing")),
+        (bi("地狱 A2 古代水道（失落之城）", "Hell A2 — Lost City (Ancient Tunnels)"), "85", bi("怪少皮薄、无冰免", "Few, thin enemies, no cold immunes"), bi("传送清图极快，适合暴风雪速刷", "Teleport clears the map fast — great for Blizzard farming")),
         (bi("地狱 A3 墨菲斯托 Mephisto", "Hell A3 — Mephisto"), "78", bi("路程短、掉率池大", "Short path, large drop pool"), bi("经典速刷点，但 <b>3.3 补丁已修复卡角打法</b>，效率不如从前，需改为正面对抗", "A classic spot, but <b>patch 3.3 removed the corner-trap method</b> — less efficient than before, you now fight it head-on")),
         (bi("地狱 A5 暴躁外皮 Pindle", "Hell A5 — Pindleskin"), "85", bi("路程极短", "Extremely short path"), bi("单人 1PP 效率怪，顺路清场", "Great for solo 1PP, clear on the way")),
-        (bi("地狱 A5 地狱议会 Trav", "Hell A5 — Travincal"), "85", bi("金币+装备双收", "Gold + gear together"), bi("可顺带攒符文与底材", "Also farm runes and bases on the side")),
+        (bi("地狱 A5 崔凡克议会", "Hell A5 — Travincal"), "85", bi("金币+装备双收", "Gold + gear together"), bi("可顺带攒符文与底材", "Also farm runes and bases on the side")),
     ]
     sr = "".join("<tr><td><b>%s</b></td><td>%s</td><td>%s</td><td>%s</td></tr>" % r for r in scene_rows)
     # 纯冰法高 MF 装备模板（来自项目 MF.md）
     gear_rows = [
         (bi("武器", "Weapon"), bi("眼球（50%MF）或 死亡深度 → 镶 24# IST", "The Oculus (50% MF) or Death's Breath → socket 24# Ist")),
         (bi("盾牌", "Shield"), bi("精神（Tal+Thul+Ort+Amn）→ 35%FCR 档", "Spirit (Tal+Thul+Ort+Amn) → 35% FCR breakpoint")),
-        (bi("头盔", "Helm"), bi("诗寇蒂的愤怒 IRE 镶完美黄宝石（最高 100%MF）", "Harlequin Crest with a perfect topaz (up to 100% MF)")),
+        (bi("头盔", "Helm"), bi("谐角之冠镶完美黄宝石（最高 100%MF）", "Harlequin Crest with a perfect topaz (up to 100% MF)")),
         (bi("衣服", "Armor"), bi("财富（Lem+Ko+Tir）300%MF", "Wealth (Lem+Ko+Tir) 300% MF")),
-        (bi("腰带", "Belt"), bi("金色包袱 30%MF", "Goldwrap 30% MF")),
+        (bi("腰带", "Belt"), bi("黄金裹腰 30%MF", "Goldwrap 30% MF")),
         (bi("手套", "Gloves"), bi("法师之拳 或 运气守护 40%MF", "Magefist or Chance Guards 40% MF")),
         (bi("鞋子", "Boots"), bi("战争旅者 50%MF", "War Traveler 50% MF")),
         (bi("项链", "Amulet"), bi("蓝色 +3 冰技 / 35%MF 或 塔拉夏项链", "Blue +3 cold skills / 35% MF, or Tal Rasha's Amulet")),
-        (bi("戒指", "Rings"), bi("双拿格 30%MF×2 或 1×乔丹 + 1×蓝色 25%MF", "Twin Nagelring 30% MF ×2, or 1× Stone of Jordan + 1× blue 25% MF")),
-        (bi("副手", "Swap"), bi("阿里巴巴（2 孔镶 IST）+ 韵律盾（IST）→ BOSS 最后一击换副手，MF 450–550 仍维持 105%FCR", "Ali Baba (2 sockets, Ist) + Rhyme shield (Ist) → switch on the boss's last hit; reach 450–550 MF while keeping 105% FCR")),
+        (bi("戒指", "Rings"), bi("双拿各的戒指 30%MF×2 或 1×乔丹 + 1×蓝色 25%MF", "Twin Nagelring 30% MF ×2, or 1× Stone of Jordan + 1× blue 25% MF")),
+        (bi("副手", "Swap"), bi("阿里巴巴（2 孔镶 IST）+ 声韵盾（IST）→ BOSS 最后一击换副手，MF 450–550 仍维持 105%FCR", "Ali Baba (2 sockets, Ist) + Rhyme shield (Ist) → switch on the boss's last hit; reach 450–550 MF while keeping 105% FCR")),
     ]
     gr = "".join("<tr><td><b>%s</b></td><td>%s</td></tr>" % (k, v) for k, v in gear_rows)
     # 佣兵 MF 配置（来自项目 MF.md）
     merc_rows = [
         (bi("武器", "Weapon"), bi("无限（Ber+Mal+Ber+Ist）→ 破多数冰免且减抗", "Infinity (Ber+Mal+Ber+Ist) → breaks most cold immunes and reduces resist")),
         (bi("衣服", "Armor"), bi("刚毅（El+Sol+Dol+Lo）", "Fortitude (El+Sol+Dol+Lo)")),
-        (bi("头盔", "Helm"), bi("安达利尔的面容（安头）镶 IST", "Andariel's Visage socketed with Ist")),
+        (bi("头盔", "Helm"), bi("安达莉尔的面容（安头）镶 IST", "Andariel's Visage socketed with Ist")),
         (bi("定位", "Role"), bi("佣兵捅冰免怪，法师专心暴风雪清场", "Merc pokes cold immunes while the Sorc focuses Blizzard on the pack")),
     ]
     mr = "".join("<tr><td><b>%s</b></td><td>%s</td></tr>" % (k, v) for k, v in merc_rows)
-    # 卓古拉之握速刷目标（来自项目 卓古拉之握.md）
+    # 德古拉之握速刷目标（来自项目 德古拉之握.md）
     drac_targets = [
-        (bi("地狱 墨菲斯托", "Hell Mephisto"), bi("场景 78", "Area 78"), bi("路程短、传统速刷主力（<b>3.3 补丁后卡角已封</b>，需正面打）；日用品掉率池大，卓古拉属“常出”档；300+ MF 即可", "Short path and the traditional farming mainstay (<b>patch 3.3 closed the corner-trap</b>, fight head-on); large rare pool, Dracul's is 'common'; 300+ MF is enough")),
-        (bi("地狱 安达利尔（恐怖地带）", "Hell Andariel (Terror Zone)"), bi("≥85 时", "At ≥85"), bi("恐怖地带刷新后掉落池升级到 85，精英暗金掉率更高；比劳模更省路程", "A Terror Zone upgrades the drop pool to 85, higher elite-unique rate; less walking than Meph")),
+        (bi("地狱 墨菲斯托", "Hell Mephisto"), bi("场景 78", "Area 78"), bi("路程短、传统速刷主力（<b>3.3 补丁后卡角已封</b>，需正面打）；日用品掉率池大，德古拉属“常出”档；300+ MF 即可", "Short path and the traditional farming mainstay (<b>patch 3.3 closed the corner-trap</b>, fight head-on); large rare pool, Dracul's is 'common'; 300+ MF is enough")),
+        (bi("地狱 安达莉尔（恐怖地带）", "Hell Andariel (Terror Zone)"), bi("≥85 时", "At ≥85"), bi("恐怖地带刷新后掉落池升级到 85，精英暗金掉率更高；比劳模更省路程", "A Terror Zone upgrades the drop pool to 85, higher elite-unique rate; less walking than Meph")),
         (bi("地狱 迪亚波罗（混沌避难所）", "Hell Diablo (Chaos Sanctuary)"), "85", bi("85 场景=最高掉落池，所有精英暗金都能掉；清场慢但顺带刷符文", "An 85 area = top drop pool, every elite unique can drop; slow clear but farms runes too")),
     ]
     dt = "".join("<tr><td><b>%s</b></td><td>%s</td><td>%s</td></tr>" % (a, b, c) for a, b, c in drac_targets)
@@ -2945,7 +2962,7 @@ def g_farming():
     ]
     da = "".join("<li><b>%s：</b>%s</li>" % (k, v) for k, v in drac_alt)
     body = '<h1><span class="zt"><span class="zc">速刷与 MF 指南 </span><span class="ec" lang="en">Farming</span></span></h1>\n' \
-           '<p>' + bi("本页内容整理自项目内文档（MF.md / 卓古拉之握.md），聚焦<strong>通关后纯冰法速刷</strong>与<strong>暗金（卓古拉之握）速刷路线</strong>，是实战向的刷宝手册。MF（Magic Find，魔法寻获）越高，亮金/套装/符文掉率越高，但会牺牲部分生存与输出，需平衡。",
+           '<p>' + bi("本页内容整理自项目内文档（MF.md / 德古拉之握.md），聚焦<strong>通关后纯冰法速刷</strong>与<strong>暗金（德古拉之握）速刷路线</strong>，是实战向的刷宝手册。MF（Magic Find，魔法寻获）越高，亮金/套装/符文掉率越高，但会牺牲部分生存与输出，需平衡。",
                       "This page is compiled from the project docs (MF.md / Dracul's Grasp.md), focusing on <strong>post-game pure-cold-Sorc farming</strong> and <strong>the unique (Dracul's Grasp) farming route</strong> — a practical loot guide. Higher MF (Magic Find) raises rare/set/rune drop rates, but trades away some survivability and damage, so balance it.") + '</p>\n' \
            '<div class="callout info"><b>' + bi("核心思路：", "Core idea:") + '</b>' + bi("练一个纯冰法师（暴风雪/冰封球）→ 力量刚好穿装备、其余全血、格挡 75%、MF 300+。先用冰免怪少的 85 场景起量，再用 Infinity 佣兵破冰免，最后靠 Sunder/副手换装把 MF 顶到 450–550。<b>3.3 补丁提醒：</b>破免在非地狱难度不再随 MF 掉落，且 Herald 掉率完全不吃 MF，本季要把<b>清场速度与 Herald 层数</b>排在 MF 数字前面。",
                 "Level a pure cold Sorc (Blizzard/Frozen Orb) → just enough Strength for gear, rest Vitality, 75% block, MF 300+. Start with 85 areas that have few cold immunes to build volume, then break cold immunes with an Infinity mercenary, and finally push MF to 450–550 via Sunder/swap gear. <b>Patch 3.3 caveat:</b> Sunders no longer drop from Magic Find outside Hell and Herald rates ignore MF entirely, so this season prioritise clear speed and Herald tiers over raw MF numbers.") + '</div>\n' \
@@ -2953,7 +2970,7 @@ def g_farming():
            '<div class="card"><table><thead><tr><th>' + bi("场景", "Spot") + '</th><th>' + bi("等级", "Lvl") + '</th><th>' + bi("特点", "Feature") + '</th><th>' + bi("备注", "Note") + '</th></tr></thead><tbody>' + sr + '</tbody></table></div>\n' \
            '<h2 class="section-id" id="mftpl">' + bi("二、纯冰法高 MF 装备模板", "2 · High-MF Gear Template (Cold Sorc)") + '</h2>\n' \
            '<div class="card"><table><thead><tr><th>' + bi("部位", "Slot") + '</th><th>' + bi("推荐", "Recommended") + '</th></tr></thead><tbody>' + gr + '</tbody></table></div>\n' \
-           '<div class="callout tip"><b>' + bi("换装技巧：", "Swap trick:") + '</b>' + bi("BOSS 最后一击前切到“阿里巴巴 + 韵律盾”副手（双镶 IST），MF 值可达 450–550，同时仍维持 105% FCR 档位，手感不掉。",
+           '<div class="callout tip"><b>' + bi("换装技巧：", "Swap trick:") + '</b>' + bi("BOSS 最后一击前切到“阿里巴巴 + 声韵盾”副手（双镶 IST），MF 值可达 450–550，同时仍维持 105% FCR 档位，手感不掉。",
                 "Before the boss's last hit, swap to the 'Ali Baba + Rhyme shield' setup (both socketed with Ist) to hit 450–550 MF while still keeping the 105% FCR breakpoint — no loss in feel.") + '</div>\n' \
            '<h2 class="section-id" id="merc">' + bi("三、佣兵 MF 阶段配置", "3 · Mercenary MF Setup") + '</h2>\n' \
            '<div class="card"><table><thead><tr><th>' + bi("部位", "Slot") + '</th><th>' + bi("推荐", "Recommended") + '</th></tr></thead><tbody>' + mr + '</tbody></table></div>\n' \
@@ -2961,14 +2978,14 @@ def g_farming():
                 "Your mercenary wields Infinity (Ber+Mal+Ber+Ist) for the Conviction aura that lowers resist, poking cold immunes while the Sorc focuses Blizzard on the pack.") + '</div>\n' \
            '<h2 class="section-id" id="loop">' + bi("四、刷宝循环示例", "4 · Sample Farming Loop") + '</h2>\n' \
            '<div class="card"><ol class="clean">\n' \
-           '<li>' + bi("开局城镇 → 传送 <b>远古通道</b> → 暴风雪清图 → 捡亮金/套装/符文 → 回城",
+           '<li>' + bi("开局城镇 → 传送 <b>古代水道</b> → 暴风雪清图 → 捡亮金/套装/符文 → 回城",
                        "Start in town → teleport to the <b>Ancient Tunnels</b> → Blizzard the map → grab rares/sets/runes → return to town") + '</li>\n' \
            '<li>' + bi("换场：<b>地穴</b> → <b>暴躁外皮</b> → <b>墨菲斯托</b>",
                        "Switch maps: the <b>Pits</b> → <b>Pindleskin</b> → <b>Mephisto</b>") + '</li>\n' \
            '<li>' + bi("每 15–20 分钟一轮，效率约 50–80 场/小时",
                        "One loop every 15–20 minutes, roughly 50–80 runs per hour") + '</li>\n</ol></div>\n' \
-           '<h2 class="section-id" id="dracul">' + bi("五、暗金速刷：卓古拉之握 Dracul's Grasp", "5 · Unique Farming: Dracul's Grasp") + '</h2>\n' \
-           '<p>' + bi("“卓古拉之握”属精英级暗金吸血鬼骸骨手套，无固定唯一掉源，<strong>任何地狱难度怪物/Boss/箱子都有可能掉</strong>。下面是一份效率高、相对省时的路线（来自项目文档）。",
+           '<h2 class="section-id" id="dracul">' + bi("五、暗金速刷：德古拉之握 Dracul's Grasp", "5 · Unique Farming: Dracul's Grasp") + '</h2>\n' \
+           '<p>' + bi("“德古拉之握”属精英级暗金吸血鬼骸骨手套，无固定唯一掉源，<strong>任何地狱难度怪物/Boss/箱子都有可能掉</strong>。下面是一份效率高、相对省时的路线（来自项目文档）。",
                       "Dracul's Grasp is an elite unique vampire bone gloves with no fixed unique source — <strong>any Hell monster/Boss/chest can drop it</strong>. Below is an efficient, relatively quick route (from the project docs).") + '</p>\n' \
            '<div class="card"><table><thead><tr><th>' + bi("目标", "Target") + '</th><th>' + bi("场景", "Spot") + '</th><th>' + bi("推荐原因", "Why") + '</th></tr></thead><tbody>' + dt + '</tbody></table></div>\n' \
            '<div class="callout info"><b>' + bi("备选 85 场景：", "Alternative 85 areas:") + '</b>' + bi("古代通道（冰法最爱）、世界之石大殿 1–3 层 + 巴尔王座、奶牛关——这些 85 场景所有精英暗金都能掉，可顺带刷符文/底材。",
@@ -2981,7 +2998,7 @@ def g_farming():
                        "10 minutes a day: check if a Terror Zone is in A1/A2 (Terror Andariel ~2 min a run); if not, run Mephisto (~1 min a run now that the corner-trap is gone), 20 runs and done") + '</li>\n' \
            '<li>' + bi("周末有空：去<strong>古代通道</strong>或<strong>混沌避难所</strong>深度刷，顺带刷符文/底材",
                        "On weekends: farm the <strong>Ancient Tunnels</strong> or <strong>Chaos Sanctuary</strong> in depth, also grabbing runes/bases") + '</li>\n</ol></div>\n' \
-           '<div class="callout warn"><b>' + bi("掉率真相：", "Drop-rate truth:") + '</b>' + bi("卓古拉之握掉率约 1:几千～1:几万（跟军帽、乌鸦同量级），属“日用品”但不算常见；劳模/安姐/85 场景轮着刷，平均 1–3 天可见一双（300+ MF 前提下）。",
+           '<div class="callout warn"><b>' + bi("掉率真相：", "Drop-rate truth:") + '</b>' + bi("德古拉之握掉率约 1:几千～1:几万（跟谐角之冠、乌鸦同量级），属“日用品”但不算常见；劳模/安姐/85 场景轮着刷，平均 1–3 天可见一双（300+ MF 前提下）。",
                 "Dracul's Grasp drops around 1:several-thousand to 1:several-tens-of-thousand (same tier as Harlequin Crest or Raven Frost) — a 'common' unique but not frequent; rotate Meph/Andariel/85-areas and you'll see a pair every 1–3 days (at 300+ MF).") + '</div>\n' \
            '<h3 class="section-id" style="margin-top:14px">' + bi("实在刷不到的替代", "Alternatives If You Can't Drop It") + '</h3>\n' \
            '<div class="card"><ul class="clean">' + da + '</ul></div>\n' \

@@ -256,12 +256,23 @@ for k, v in MANUAL_UNI.items():
 
 # 符文之语缺口
 MANUAL_RW = {
- "Ancients' Pledge":"远古誓约","Authority":"权威","Coven":"契约",
+ "Ancients' Pledge":"远古誓约","Authority":"权威","Coven":"女巫团",
  "Hustle (armor)":"匆忙(甲)","Hustle (weapon)":"匆忙(武器)","King's Grace":"国王恩典",
- "Ritual":"仪式","Vigilance":"警觉","Void":"虚空",
+ "Ritual":"仪式","Vigilance":"警戒","Void":"虚空",
 }
 for k, v in MANUAL_RW.items():
     EN2ZH.setdefault(k, v)
+
+# 符文之语国服正式译名（覆盖 tracker 的繁转简名；tracker 与国服存在差异，
+# 如 Mosaic 国服为「模糊」而非「嵌饰」、Cure 为「解药」而非「治愈」）。
+RUNEWORD_ZH_FIX = {
+    "Mosaic": "模糊", "Obsession": "执着", "Unbending Will": "不屈之志",
+    "Chains of Honor": "荣耀之链", "Insight": "眼光", "Coven": "女巫团",
+    "Cure": "解药", "Hearth": "壁炉", "Metamorphosis": "变形",
+    "Pattern": "典范", "Sanctuary": "庇护所", "Temper": "淬火",
+    "Vigilance": "警戒", "Venom": "毒液",
+}
+EN2ZH.update(RUNEWORD_ZH_FIX)
 
 # 套装缺口：官方表未收录的才需要（Warlord's Glory 已整组过滤，不需要译名）
 MANUAL_SETS = {
@@ -792,6 +803,19 @@ def build_uniques():
     return out
 
 RWS = build_runewords()
+
+# Patch 3.4 重做 Eternity（官方补丁说明 + d2runewizard 词缀表）。d2data 仍是 3.3
+# 数据，重新生成时必须手工对齐，否则编年史会回退到旧数值、与符文之语页打架。
+for _rw in RWS:
+    if _rw['en'] == 'Eternity':
+        _rw['base'] = '近战/远程武器'
+        _rw['effects'] = [
+            '增强伤害 +300~390', '攻击速度 +30', '最小伤害 +9',
+            '按角色等级 +3~297 最大伤害', '压碎性打击 20%', '击中致盲目标 +1',
+            '减速目标 33%', '生命回复 +16', '法力回复 16%', '无法冰冻 +1',
+            '生命偷取 7%', '魔法装备掉落 30%', '+5 重生（o skill）', '无法破坏 +1',
+        ]
+
 SETS = build_sets()
 UNIS = build_uniques()
 
